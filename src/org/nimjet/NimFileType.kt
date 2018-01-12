@@ -3,10 +3,7 @@ package org.nimjet
 import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
-class NimFileType : LanguageFileType(NimLanguage.INSTANCE) {
-	companion object {
-		val INSTANCE = NimFileType()
-	}
+object NimFileType : LanguageFileType(NimLanguage) {
 	override fun getName(): String {
 		return "Nim file"
 	}
