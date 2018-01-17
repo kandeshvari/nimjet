@@ -1,0 +1,208 @@
+{
+  parserClass = "org.nimjet.parser.NimParser"
+  extends = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  elementTypeHolderClass = "org.nimjet.psi.ElementTypes"
+  elementTypeClass = "org.nimjet.psi.NimElementType"
+  tokenTypeClass = "org.nimjet.psi.NimTokenType"
+
+  parserUtilClass = "org.nimjet.parser.NimParserUtil"
+
+  tokens = [
+    T_IF='if'
+    T_WHEN='when'
+    T_WHILE='while'
+    T_CASE='case'
+//    T_FOR='for'
+    //T_VAR='var'
+    T_LET='let'
+    T_CONST='const'
+    T_BLOCK='block'
+    T_TRY='try'
+    T_EXCEPT='except'
+    T_FINALLY='finally'
+    T_INCLUDE='include'
+    T_MIXIN='mixin'
+    T_DISCARD='discard'
+
+    T_COLON=':'
+    T_COMMA=','
+
+    OP_ASSIGN='='
+    OP_PLUS='+'
+    OP_MINUS='-'
+    OP_MULTIPLY='*'
+    OP_DIVIDE='/'
+    OP_EQ='=='
+    OP_NE='!='
+    OP_LT='<'
+    OP_LE='<='
+    OP_GT='>'
+    OP_GE='>='
+
+    OPEN_SBRACKET='['
+    CLOSE_SBRACKET=']'
+    OPEN_BRACKET='('
+    CLOSE_BRACKET=')'
+
+    KEYWORD="echo"
+    T_VAR="var"
+    T_LET="let"
+    T_CONST="const"
+    T_SEQ="seq"
+    T_PROC="proc"
+    T_IMPORT="import"
+    T_ELIF="elif"
+    T_IF="if"
+    T_ELSE="else"
+    T_FOR="for"
+    T_IN="in"
+    T_WHILE="while"
+    T_BLOCK="block"
+    T_DISCARD="discard"
+    T_RETURN="return"
+//    STRING=\"([^\"\\]|\\\\|\\\"|\\n|\\t)*\"
+    CHAR='.'
+//    NUMBER=[0-9]+(\.[0-9]+)?
+//    IDENTIFIER=[a-zA-Z][a-zA-Z_0-9]*
+//    OPERATOR_IDENTIFIER=`[\=\+\-\*\/\<\>\@\$\~\&\%\|\!\?\^\.\:\\]+`
+//    CUSTOM_OPERATOR=[\=\+\-\*\/\<\>\@\$\~\&\%\|\!\?\^\.\:\\]+
+    T_AT="@"
+    NIL="nil"
+//    TEMPLATE=\{\.[a-zA-Z][a-zA-Z_0-9]*\.\}
+
+    T_DOT='.'
+
+    OP_MATCH='=~'
+    OP_LOGICAL_OR='or'
+    OP_LOGICAL_AND='and'
+
+    space='regexp:\s+'
+    id="regexp:\p{Alpha}\w*"
+    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    number="regexp:\d+(\.\d+)*"
+    line_comment="regexp:#.*"
+    block_comment="regexp:#\[(.|\n)*\]#"
+
+  ]
+}
+
+module ::= import_section ? ( var_init_block
+                            | let_init_block
+                            | const_init_block
+                            | proc
+                            | nonempty_block
+                            | import_section
+                            | TEMPLATE
+                            | COMMENT ) *
+
+private IDENTIFIER ::= id
+//private NUMBER ::= number
+private STRING ::= string
+
+meta CommaSeparatedList ::= <<p>> (T_COMMA <<p>>)*
+
+import_section ::= T_IMPORT ident_list
+
+var_init_block ::= T_VAR var_init+
+var_init ::= ident_init
+
+let_init_block ::= T_LET let_init+
+let_init ::= ident_init
+
+const_init_block ::= T_CONST const_init+
+const_init ::= ident_init
+
+ident_init ::= ident_list ( ( ( T_COLON type )? OP_ASSIGN expr ) | T_COLON type )
+ident_list ::= IDENTIFIER ( T_COMMA IDENTIFIER ) *
+
+proc ::= T_PROC ( ( IDENTIFIER '*' ? ) | OPERATOR_IDENTIFIER ) params_list ( T_COLON type ) ? OP_ASSIGN ( var_init_block | let_init_block | nonempty_block | COMMENT ) * return_ ?
+//params_list ::= OPEN_BRACKET ( ident_list T_COLON (type | mutable_type)( T_COMMA ident_list T_COLON type ) * )? CLOSE_BRACKET
+params_list ::= OPEN_BRACKET ( param_def ( T_COMMA param_def ) * )? CLOSE_BRACKET
+param_def ::= IDENTIFIER ( ( ( T_COLON T_VAR? type )? OP_ASSIGN expr ) | T_COLON T_VAR? type )
+//ident_assign ::= IDENTIFIER ( ( ( T_COLON T_VAR? type )? OP_ASSIGN expr ) | T_COLON T_VAR? type )
+return_ ::= T_RETURN expr ?
+//mutable_type ::= T_VAR? type
+
+stmt ::= ( ident_expr OP_ASSIGN expr ) | invokation
+
+expr ::= operator? expr_ (operator expr_)*
+private expr_ ::= addr_expr
+                | field_expr
+                | invokation_chain
+                | NIL
+                | paren_expr
+                | access_expr
+                | ident_expr
+                | literal_expr
+                | invokation
+                | invokation_with_brackets
+paren_expr ::= OPEN_BRACKET expr CLOSE_BRACKET
+access_expr ::= ident_expr OPEN_SBRACKET expr CLOSE_SBRACKET
+
+operator ::= arithmetic_operator | boolean_operator | regexp_operator | CUSTOM_OPERATOR
+arithmetic_operator ::= OP_PLUS | OP_MINUS | OP_MULTIPLY | OP_DIVIDE | OP_MOD | OP_AND | OP_XOR | OP_OR | OP_STRINGIFY
+regexp_operator ::= OP_MATCH
+field_expr ::= ( invokation_chain | paren_expr | IDENTIFIER ) ( T_DOT IDENTIFIER ) +
+invokation_chain ::= invokation_with_brackets ( T_DOT invokation_with_brackets ) *
+//invokation ::= ( ident_expr | KEYWORD ) OPEN_BRACKET ? expr ? ( T_COMMA expr ) * CLOSE_BRACKET ?
+invokation ::= (ident_expr | KEYWORD) ((OPEN_BRACKET CommaSeparatedList <<expr>>? CLOSE_BRACKET) | CommaSeparatedList <<expr>>?)
+invokation_with_brackets ::= OPEN_BRACKET CommaSeparatedList <<expr>>? CLOSE_BRACKET
+literal_expr ::= literal
+literal ::= seq_literal | array_literal | STRING | CHAR | NUMBER | bool_literal
+seq_literal ::= T_AT array
+array_literal ::= array
+array ::= OPEN_SBRACKET ( expr ( T_COMMA expr ) * ) ? CLOSE_SBRACKET
+bool_literal ::= T_TRUE | T_FALSE
+boolean_operator ::= OP_EQ | OP_NE | OP_LT | OP_LE | OP_GT | OP_GE | OP_AND_FULL | OP_XOR_FULL | OP_OR_FULL
+| OP_LOGICAL_OR | OP_LOGICAL_AND
+
+addr_expr ::= OP_ADDR ( ( OPEN_BRACKET ident_expr CLOSE_BRACKET ) | ident_expr )
+
+ident_expr ::=  IDENTIFIER ( T_DOT ( IDENTIFIER | invokation_with_brackets ) ) * 
+//ident_with_sbrackets ::= IDENTIFIER (OPEN_SBRACKET expr CLOSE_SBRACKET)?
+//ident_expr ::= ident_with_sbrackets 
+
+type ::= seq | type_
+seq ::= T_SEQ OPEN_SBRACKET type_ CLOSE_SBRACKET
+type_ ::= 'string' | 'bool' | 'int' | type_array_ | IDENTIFIER
+type_array_ ::= IDENTIFIER OPEN_SBRACKET range T_COMMA type_ CLOSE_SBRACKET
+
+if_block ::= T_IF expr T_COLON block ( elif_block ) * else_block ?
+elif_block ::= T_ELIF expr T_COLON block
+else_block ::= T_ELSE T_COLON block
+
+//for_block ::= T_FOR ident_expr T_IN ( invokation | range ) T_COLON
+for_block ::= T_FOR IDENTIFIER T_IN ( invokation | range ) T_COLON
+//private for_recover ::= !(T_COLON)
+
+range ::= int_range | char_range
+int_range ::= NUMBER T_RANGE NUMBER
+char_range ::= CHAR T_RANGE CHAR
+
+while_block ::= T_WHILE expr T_COLON block
+
+case_block ::= T_CASE ident_expr of_block + else_block ?
+of_block ::= T_OF of_value_list T_COLON block
+of_value_list ::= of_value ( T_COMMA of_value ) *
+of_value ::= ident_expr | range | literal
+
+nonempty_block ::= block_ +
+block ::= block_ *
+block_ ::= if_block
+            | for_block
+            | while_block
+            | case_block
+            | block_expr
+            | when_expr
+            | break_expr
+            | stmt
+            | var_init_block
+            | invokation
+            | discard_expr
+
+block_expr ::= T_BLOCK IDENTIFIER T_COLON
+when_expr ::= T_WHEN IDENTIFIER T_COLON
+break_expr ::= T_BREAK IDENTIFIER ?
+discard_expr ::= T_DISCARD expr ?
+

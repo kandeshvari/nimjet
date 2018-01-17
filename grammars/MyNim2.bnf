@@ -1,0 +1,192 @@
+{
+  parserClass = "org.nimjet.parser.NimParser"
+  extends = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  elementTypeHolderClass = "org.nimjet.psi.ElementTypes"
+  elementTypeClass = "org.nimjet.psi.NimElementType"
+  tokenTypeClass = "org.nimjet.psi.NimTokenType"
+
+ // parserUtilClass = "org.nimjet.parser.NimParserUtil"
+
+//  generate=[psi="no" elements="no" tokens="no"]
+//  generate=[tokens="no" elements="no"]
+
+
+tokens =[
+    // built-in types
+    T_TYPE_INT='int'
+    T_TYPE_STRING='string'
+    T_TYPE_FLOAT='float'
+
+    // keywords
+    T_PROC='proc'
+    T_VAR='var'
+    T_LET='let'
+    T_CONST='const'
+    T_IMPORT='import'
+    T_DO='do'
+    T_NIL='nil'
+
+    // built-in procs
+    T_ECHO='echo'
+
+    T_EQ='='
+    T_COLON=':'
+    T_OPEN_BRACKET='('
+    T_CLOSE_BRACKET=')'
+    T_OPEN_SBRACKET='['
+    T_CLOSE_SBRACKET=']'
+    T_COMMA=','
+    T_SEMICOLON=';'
+
+//    CRLF="regexp:\n"
+
+    space='regexp:\s+'
+    id="regexp:\p{Alpha}\w*"
+    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+//    number="regexp:\d{1,}"
+    number="regexp:\d+(\.\d+)*"
+//    float="regexp:\d+\.\d+"
+    char='regexp:[a-zA-Z]'
+    line_comment="regexp:#.*"
+    block_comment="regexp:#\[(.|\n)*\]#"]
+}
+
+NimFile ::= statement
+
+// meta
+meta comma_separated_list ::= <<p>> (T_COMMA <<p>>)*
+
+// private
+private optInd ::= COMMENT?
+private optPar ::= (INDGT | INDEQ)?
+private optPar ::= (INDGT | INDEQ)?
+private indEnd ::= ';'?
+
+statement ::= (var_section | let_section | expr)*
+
+// variable definition
+var_def ::= indNone? var_ident ( ( T_COLON type (T_EQ expr)? ) | ( T_EQ expr ) ) indEnd
+
+// expression
+expr ::= invocation | literal | ident
+
+// invocation // TODO: fix brackets
+invocation ::= ident (T_OPEN_BRACKET? << comma_separated_list expr >>? T_CLOSE_BRACKET?)?
+
+// indentifiers
+var_ident ::= id
+simple_ident ::= id
+access_ident ::= id (T_OPEN_SBRACKET expr T_CLOSE_SBRACKET)?
+ident ::= (literal '.')? dot_ident | builtin_proc | simple_ident
+dot_ident ::= (array_list | access_ident) ('.' dot_ident)?
+
+// literals
+//FLOAT_LIT ::= number
+//INT_LIT ::= number
+//INT8_LIT ::= number
+//INT16_LIT ::= number
+//STR_LIT ::= string
+//CHAR_LIT ::= "'" char "'"
+literal ::= CHAR_LITERAL | INT8_LITERAL  | INT16_LITERAL | INT32_LITERAL | INT64_LITERAL
+          | UINT_LITERAL | UINT8_LITERAL | UINT16_LITERAL | UINT32_LITERAL | UINT64_LITERAL
+          | FLOAT32_LITERAL | FLOAT64_LITERAL
+          | STR_LITERAL | RSTR_LITERAL | TRIPLESTR_LITERAL
+          | T_NIL |  FLOAT_LITERAL | INT_LITERAL
+
+// built-ins
+builtin_type ::= 'int' | 'string' | 'float'
+builtin_proc ::=  'echo'
+
+// arrays
+array_list ::= T_OPEN_SBRACKET << comma_separated_list expr >> T_CLOSE_SBRACKET
+
+// type *
+type ::= builtin_type | custom_type
+custom_type ::= id
+
+
+// sections
+var_section ::= T_VAR var_def*
+let_section ::= T_LET var_def*
+
+//
+//proc_routine ::= T_PROC optInd identVis pattern? genericParamList?
+//identVis ::= symbol opr?  // postfix position
+//symbol ::= '`' ( KEYW | id | literal | ( operator | '(' | ')' | '[]' | '{' | '}' | '=' )+)+ '`'
+//       | id | KEYW | literal | ( operator | '(' | ')' | '[]' | '{' | '}' | '='
+//literal ::= INT_LIT | INT8_LIT | INT16_LIT | INT32_LIT | INT64_LIT
+//          | UINT_LIT | UINT8_LIT | UINT16_LIT | UINT32_LIT | UINT64_LIT
+//          | FLOAT_LIT | FLOAT32_LIT | FLOAT64_LIT
+//          | STR_LIT | RSTR_LIT | TRIPLESTR_LIT
+//          | CHAR_LIT
+//          | NIL
+//STR_LIT ::= string
+//
+//
+//genericParamList ::= '[' optInd genericParam* (T_COMMA|T_SEMICOLON) optPar ']'
+//genericParam ::= symbol (T_COMMA symbol)* (T_COLON expr)? ('=' optInd expr)?
+//expr ::= simpleExpr
+//primary ::= typeKeyw typeDesc
+//            | identOrLiteral
+//identOrLiteral ::= generalizedLit
+//                    | symbol
+//                    | literal
+//                    | par
+//                    | arrayConstr
+//                    | setOrTableConstr
+//                    | castExpr
+//
+//simpleExpr ::= primary (OP10? optInd primary)*
+//typeKeyw ::= 'var' | 'out' | 'ref' | 'ptr' | 'shared' | 'tuple'
+//         | 'proc' | 'iterator' | 'distinct' | 'object' | 'enum'
+//typeDesc ::= buiilInTypes
+//private buiilInTypes ::= 'string' | 'int' | 'float'
+//
+//private item_ ::=
+//    const_sect
+//    |import_sect
+//    |var_sect
+//    |let_sect
+//    |CRLF|COMMENT
+////private WS ::= WHITE_SPACE
+////external INDNONE ::= indNone
+////external INDEQ ::= indEq
+//
+////private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+//private Identifier ::= id
+//
+////meta comma_separated_list ::= <<p>> ( ',' <<p>> ) *
+//meta comma_separated_list ::= <<p>> (T_COMMA <<p>>)*
+//
+////ConstSec ::= T_CONST <<section ConstDef>>
+//const_sect ::= T_CONST ConstDef
+//var_sect ::= T_VAR TypeDef
+//let_sect ::= T_LET TypeDef
+//
+//// KW: IMPORT
+//import_sect ::= T_IMPORT import_def
+//import_def ::= << comma_separated_list Identifier >>
+//
+//
+//
+////ProcCall ::= IDENT T_L_BRACE Expression (',' Expression)* T_R_BRACE
+//ProcCall ::= Identifier T_L_BRACE <<comma_separated_list Expression>> T_R_BRACE
+//Expression ::= (ProcCall|Identifier|number)
+//private type ::= TokenTypes | CustomTypes
+//TokenTypes ::= (T_TYPE_INT | T_TYPE_STRING | T_TYPE_FLOAT)
+//CustomTypes ::= Identifier (T_OPEN_BRACKET type T_CLOSE_BRACKET)?
+//TypeDef ::= Identifier T_COLON type (T_EQ Expression)?
+//ConstDef ::= Identifier  (T_COLON type)? T_EQ Expression?
+//
+//
+////private TokTypes ::= (T_TYPE_INT | T_TYPE_STRING)
+////private item_ ::= (VarSec|COMMENT|CRLF|ws)
+////private symbol ::= IDENT
+//////private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+////
+////TypeDef ::= symbol ws? ':' ws? 'int'
+////VarSec ::= T_VAR WS &TypeDef
+//////VarSec ::= T_VAR (WS &TypeDef | CRLF &IND TypeDef)
+////
+//////procDef ::= K_PROC WS

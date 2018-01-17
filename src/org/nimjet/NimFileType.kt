@@ -9,7 +9,7 @@ object NimFileType : LanguageFileType(NimLanguage) {
 	}
 
 	override fun getDefaultExtension(): String {
-		return "org/nimjet"
+		return "nim"
 	}
 
 	override fun getDescription(): String {

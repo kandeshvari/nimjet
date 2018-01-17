@@ -27,6 +27,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.nimjet.NimFileTypeFactory"/>
+
+        <lang.parserDefinition language="Nim" implementationClass="org.nimjet.NimParserDefinition"/>
         <!-- Add your extensions here -->
     </extensions>
 

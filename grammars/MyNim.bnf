@@ -1,0 +1,90 @@
+{
+  parserClass = "org.nimjet.parser.NimParser"
+  extends = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  elementTypeHolderClass = "org.nimjet.psi.ElementTypes"
+  elementTypeClass = "org.nimjet.psi.NimElementType"
+  tokenTypeClass = "org.nimjet.psi.NimTokenType"
+
+  parserUtilClass = "org.nimjet.parser.NimParserUtil"
+
+//  generate=[psi="no" elements="no" tokens="no"]
+
+
+tokens =[
+    T_TYPE_INT='int'
+    T_TYPE_STRING='string'
+    T_TYPE_FLOAT='float'
+
+    T_PROC='proc'
+    T_VAR='var'
+    T_LET='let'
+    T_CONST='const'
+    T_IMPORT='import'
+
+    T_EQ='='
+    T_COLON=':'
+    T_OPEN_BRACKET='('
+    T_CLOSE_BRACKET=')'
+    T_OPEN_SBRACKET='['
+    T_CLOSE_SBRACKET=']'
+    T_COMMA=','
+
+    space='regexp:\s+'
+    id="regexp:\p{Alpha}\w*"
+    string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+    number="regexp:\d+(\.\d+)*"
+    line_comment="regexp:#.*"
+    block_comment="regexp:#\[(.|\n)*\]#"]
+
+}
+
+NimFile ::= item_*
+
+private item_ ::=
+    const_sect
+    |import_sect
+    |var_sect
+    |let_sect
+    |CRLF|COMMENT
+//private WS ::= WHITE_SPACE
+//external INDNONE ::= indNone
+//external INDEQ ::= indEq
+
+//private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+private Identifier ::= id
+
+//meta comma_separated_list ::= <<p>> ( ',' <<p>> ) *
+meta comma_separated_list ::= <<p>> (T_COMMA <<p>>)*
+
+//ConstSec ::= T_CONST <<section ConstDef>>
+const_sect ::= T_CONST ConstDef
+var_sect ::= T_VAR TypeDef
+let_sect ::= T_LET TypeDef
+
+// KW: IMPORT
+import_sect ::= T_IMPORT import_def
+import_def ::= << comma_separated_list Identifier >>
+
+
+
+//ProcCall ::= IDENT T_L_BRACE Expression (',' Expression)* T_R_BRACE
+ProcCall ::= Identifier T_L_BRACE <<comma_separated_list Expression>> T_R_BRACE
+Expression ::= (ProcCall|Identifier|number)
+private type ::= TokenTypes | CustomTypes
+TokenTypes ::= (T_TYPE_INT | T_TYPE_STRING | T_TYPE_FLOAT)
+CustomTypes ::= Identifier (T_OPEN_BRACKET type T_CLOSE_BRACKET)?
+TypeDef ::= Identifier T_COLON type (T_EQ Expression)?
+ConstDef ::= Identifier  (T_COLON type)? T_EQ Expression?
+
+
+//private TokTypes ::= (T_TYPE_INT | T_TYPE_STRING)
+//private item_ ::= (VarSec|COMMENT|CRLF|ws)
+//private symbol ::= IDENT
+////private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+//
+//TypeDef ::= symbol ws? ':' ws? 'int'
+//VarSec ::= T_VAR WS &TypeDef
+////VarSec ::= T_VAR (WS &TypeDef | CRLF &IND TypeDef)
+//
+////procDef ::= K_PROC WS

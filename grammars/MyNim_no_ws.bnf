@@ -1,0 +1,87 @@
+{
+  parserClass = "org.nimjet.parser.NimParser"
+  extends = "com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  elementTypeHolderClass = "org.nimjet.psi.ElementTypes"
+  elementTypeClass = "org.nimjet.psi.NimElementType"
+  tokenTypeClass = "org.nimjet.psi.NimTokenType"
+
+  parserUtilClass = "org.nimjet.parser.NimParserUtil"
+
+//  generate=[psi="no" elements="no" tokens="no"]
+
+
+tokens =[
+//    SEPARATOR='regexp:\s*=\s*'
+//    VALUE='regexp:[0-9]+'
+
+    T_TYPE_INT='int'
+    T_TYPE_STRING='string'
+    T_TYPE_FLOAT='float'
+
+    T_PROC='proc'
+    T_VAR='var'
+    T_LET='let'
+    T_CONST='const'
+
+    T_EQ='='
+    T_COLON=':'
+    T_L_BRACE='('
+    T_R_BRACE=')'
+    T_OPEN_BRACKET='['
+    T_CLOSE_BRACKET=']'
+
+    CRLF="regexp:\n"
+    COMMENT='regexp:#.*'
+//    WHITE_SPACE='regexp:\s+'
+    NUMBER='regexp:\d+(\.\d+)*'
+    IDENT="regexp:\p{Alpha}\w*"
+    space='regexp:\s+'
+]
+
+}
+
+
+NimFile ::= item_*
+
+private item_ ::=
+    ConstSec
+    |VarSec
+    |LetSec
+    |CRLF|COMMENT
+//private  ::= WHITE_SPACE
+
+external INDNONE ::= indNone
+external INDEQ ::= indEq
+
+//private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+private Identifier ::=  IDENT 
+
+//meta comma_separated_list ::= <<p>> ( ',' <<p>> ) *
+meta comma_separated_list ::=  <<p>> ( ','  <<p>>)* 
+
+//ConstSec ::= T_CONST <<section ConstDef>>
+ConstSec ::= T_CONST  (&INDNONE ConstDef | <<indented ConstDef (&INDEQ ConstDef)*>>)
+VarSec ::= T_VAR  TypeDef
+LetSec ::= T_LET  TypeDef
+
+//ProcCall ::= IDENT T_L_BRACE  Expression  ( ','  Expression)*  T_R_BRACE
+ProcCall ::= IDENT T_L_BRACE  <<comma_separated_list Expression>> T_R_BRACE
+Expression ::=  (ProcCall|IDENT|NUMBER) 
+private type ::= TokenTypes | CustomTypes
+TokenTypes ::=  (T_TYPE_INT | T_TYPE_STRING | T_TYPE_FLOAT) 
+CustomTypes ::=  Identifier (T_OPEN_BRACKET type T_CLOSE_BRACKET)? 
+TypeDef ::= Identifier T_COLON type (T_EQ Expression)?
+ConstDef ::= Identifier  (T_COLON type)? T_EQ Expression?
+
+
+//private TokTypes ::= (T_TYPE_INT | T_TYPE_STRING)
+//private item_ ::= (VarSec|COMMENT|CRLF|)
+//private symbol ::= IDENT
+////private meta section ::= &INDNONE <<p>> | <<indented <<listOf <<p>> INDEQ>>>>
+//
+//TypeDef ::= symbol  ':'  'int'
+//VarSec ::= T_VAR  &TypeDef
+////VarSec ::= T_VAR ( &TypeDef | CRLF &IND TypeDef)
+//
+////procDef ::= K_PROC 
