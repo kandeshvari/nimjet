@@ -11,9 +11,23 @@ import static org.nimjet.psi.ElementTypes.*;
 %%
 
 %{
-  public NimLexer() {
-    this((java.io.Reader)null);
-  }
+    public NimLexer() {
+        this((java.io.Reader)null);
+    }
+
+//    private void X(String msg) {
+//        System.out.println(msg);
+//    }
+
+    private void pushState(int newState) {
+        stateStack[stateDepth++] = zzLexicalState;
+        yybegin(newState);
+    }
+
+    private void popState() {
+        yybegin(stateStack[--stateDepth]);
+    }
+
 %}
 
 
@@ -28,7 +42,10 @@ import static org.nimjet.psi.ElementTypes.*;
 %eof}
 
 %{
-  int blockCommentNestingLevel = 0;
+  private int blockCommentNestingLevel = 0;
+  private int docBlockCommentNestingLevel = 0;
+  private int[] stateStack = new int[128];
+  private int stateDepth = 0;
 %}
 
 %state YYINITIAL
@@ -36,9 +53,6 @@ import static org.nimjet.psi.ElementTypes.*;
 WHITE_SPACE_CHAR = [\ \n\r\t\f]
 
 IDENT = ([:letter:] | [\u2013]) ("_"? ([:letter:] | [:digit:] | [\u2013]))*
-
-LINE_COMMENT = "#" [^\r\n\[]* (\r? \n [\ \t]* "#" [^\r\n\[]*)*
-DOC_COMMENT = "##" [^\r\n\[]* (\r? \n [\ \t]* "#" [^\r\n\[]*)*
 
 HEX_LIT = "0" [xX] [0-9A-Fa-f] [0-9A-Fa-f_]*
 DEC_LIT = [0-9] [0-9_]*
@@ -73,6 +87,8 @@ ACCENT_QUOTED = ` [^`\r\n]* `
 
 OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
 
+%state IN_LINE_COMMENT
+%state IN_DOC_COMMENT
 %state IN_BLOCK_COMMENT
 %state IN_DOC_BLOCK_COMMENT
 
@@ -81,11 +97,10 @@ OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
 <YYINITIAL> {
   {WHITE_SPACE_CHAR}+ { return WHITE_SPACE; }
 
-  "#[" { yybegin(IN_BLOCK_COMMENT); yypushback(2); }
-  "##[" { yybegin(IN_DOC_BLOCK_COMMENT); yypushback(2); }
-
-  {DOC_COMMENT} { System.out.printf("** DOC COMMENT\n"); return DOC_COMMENT; }
-  {LINE_COMMENT} { System.out.printf("** LINE COMMENT\n"); return LINE_COMMENT; }
+  "##["             { pushState(IN_DOC_BLOCK_COMMENT); docBlockCommentNestingLevel++; }
+  "#["              { pushState(IN_BLOCK_COMMENT); blockCommentNestingLevel++; }
+  "##"              { pushState(IN_DOC_COMMENT); }
+  "#"               { pushState(IN_LINE_COMMENT); }
 
   {FLOAT64_LITERAL} { return FLOAT64_LITERAL; }
   {FLOAT32_LITERAL} { return FLOAT32_LITERAL; }
@@ -214,31 +229,45 @@ OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
   [^] { return BAD_CHARACTER; }
 }
 
-<IN_BLOCK_COMMENT> {
-    "#["    {   blockCommentNestingLevel++; }
-    "]#"    { if (--blockCommentNestingLevel == 0) {
-                    yybegin(YYINITIAL);
-                    return BLOCK_COMMENT;
-              }
-            }
-    "##[" { yybegin(IN_DOC_BLOCK_COMMENT); yypushback(2); }
+<IN_LINE_COMMENT> {
+    <<EOF>> { popState(); return LINE_COMMENT; }
+    [^\r\n] { }
+    "\r\n" { popState(); yypushback(2); return LINE_COMMENT;  }
+    "\n" { popState(); yypushback(1); return LINE_COMMENT;  }
+}
 
-    <<EOF>> { blockCommentNestingLevel = 0; yybegin(YYINITIAL); return BLOCK_COMMENT; }
+<IN_DOC_COMMENT> {
+    <<EOF>> { popState(); return DOC_COMMENT; }
+    [^\r\n] { }
+    "\r\n" { popState(); yypushback(2);  return DOC_COMMENT; }
+    "\n" { popState(); yypushback(1);  return DOC_COMMENT; }
+}
+
+<IN_BLOCK_COMMENT> {
+    "##["   {   docBlockCommentNestingLevel++; pushState(IN_DOC_BLOCK_COMMENT); }
+    "#["    {   blockCommentNestingLevel++; pushState(IN_BLOCK_COMMENT); }
+    "]#"    {   popState();
+                if (--blockCommentNestingLevel == 0 && docBlockCommentNestingLevel == 0) {
+                    return BLOCK_COMMENT;
+                }
+            }
+
+    <<EOF>> { blockCommentNestingLevel = 0; popState(); return BLOCK_COMMENT; }
 
     [^] { }
 
 }
 
 <IN_DOC_BLOCK_COMMENT> {
-    "##["    { blockCommentNestingLevel++; }
-    "]##"    { if (--blockCommentNestingLevel == 0) {
-                    yybegin(YYINITIAL);
+    "##["    {  docBlockCommentNestingLevel++;  pushState(IN_DOC_BLOCK_COMMENT);}
+    "]##"    {  popState();
+                if (--docBlockCommentNestingLevel == 0 && blockCommentNestingLevel == 0) {
                     return DOC_BLOCK_COMMENT;
-               }
+                }
              }
-    "#[" { yybegin(IN_BLOCK_COMMENT); yypushback(2); }
+    "#[" { blockCommentNestingLevel++; pushState(IN_BLOCK_COMMENT); }
 
-    <<EOF>> { blockCommentNestingLevel = 0; yybegin(YYINITIAL); return DOC_BLOCK_COMMENT; }
+    <<EOF>> { docBlockCommentNestingLevel = 0; popState(); return DOC_BLOCK_COMMENT; }
 
     [^] { }
 
