@@ -32,7 +32,7 @@ external OPTIND ::= indOpt
 private meta listOf ::= <<p1>> (<<p2>> <<p1>>)*
 
 
-private symbol ::= IDENT | T_ADDR | T_TYPE | ACCENT_QUOTED
+private symbol ::= IDENT | T_ADDR | T_TYPE | ACCENT_QUOTED | '_'
 
 private stringLiteral ::= STRING_LITERAL | TRIPLESTR_LITERAL
 Literal ::= FLOAT64_LITERAL
@@ -173,7 +173,7 @@ VarSect ::= T_VAR <<section VarDef>> {pin=1 extends=Statement}
 
 ConstDef ::= identWithPragma colonTypeDesc? T_EQ &OPTIND expr
 VarDef ::= identColonEqualsWithPragma | varTuple
-private varTuple ::= T_LPAREN &OPTIND <<listOf (&(IDENT | ACCENT_QUOTED) IdentPragmaPair) (T_COMMA)>>? !INDLT T_RPAREN T_EQ &OPTIND expr {pin=1}
+private varTuple ::= T_LPAREN &OPTIND <<listOf (&(IDENT | ACCENT_QUOTED | '_') IdentPragmaPair) (T_COMMA)>>? !INDLT T_RPAREN T_EQ &OPTIND expr {pin=1}
 
 TypeDesc ::= <<typeDescMode simpleExpr>>
 
