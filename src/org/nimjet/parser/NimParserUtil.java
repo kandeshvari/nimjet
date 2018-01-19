@@ -81,18 +81,13 @@ public class NimParserUtil extends GeneratedParserUtilBase {
 	}
 
 	public static boolean indented(PsiBuilder builder, int level, Parser parser) {
-//		System.out.printf("XXX (indented) builder %s\n", builder.toString());
-
 		ParserState state = getParserState(builder);
 		int tokIndent = state.getTokenIndent();
-//		System.out.printf("XXX (indented): indentation/current: %d/%d\n", tokIndent, state.currentIndent);
 		if (tokIndent > state.currentIndent) {
 			int prevIndent = state.currentIndent;
-//			System.out.printf("XXX (indented) ENTER PARSER %d\n", state.currentIndent);
 			state.currentIndent = tokIndent;
 			boolean result = parser.parse(builder, level + 1);
 			state.currentIndent = prevIndent;
-//			System.out.printf("XXX (indented) LEAVE PARSER %d\n", state.currentIndent);
 			return result;
 		}
 		return false;
@@ -178,9 +173,9 @@ public class NimParserUtil extends GeneratedParserUtilBase {
 
 	public static boolean extendCommand(PsiBuilder builder, int level, Parser children) {
 		LighterASTNode leftNode = builder.getLatestDoneMarker();
+		assert leftNode != null;
 		if (leftNode.getTokenType() != COMMAND_EXPR)
 			return false;
-		System.out.printf("extendCommand: (%s)\n", builder.getTokenText());
 
 		PsiBuilderImpl.Marker left = (PsiBuilderImpl.Marker) leftNode;
 		PsiBuilder.Marker newMarker = left.precede();
@@ -198,13 +193,9 @@ public class NimParserUtil extends GeneratedParserUtilBase {
 		PsiBuilder.Marker marker = builder.mark();
 		if (!primary.parse(builder, level + 1)) {
 			marker.drop();
-			System.out.printf("parseSimpleExpr return FALSE (%s)\n", builder.getTokenText());
 			return false;
 		}
-		System.out.printf("#1 parseSimpleExpr -> parseOperators (%s)\n", builder.getTokenText());
-		boolean parsed = parseOperators(builder, level + 1, primary, marker, limit);
-		System.out.printf("#2 parseSimpleExpr return %b\n", parsed);
-		return parsed;
+		return parseOperators(builder, level + 1, primary, marker, limit);
 	}
 
 	private static boolean parseOperators(PsiBuilder builder, int level, Parser primary, PsiBuilder.Marker headMarker, int limit) {
@@ -258,7 +249,6 @@ public class NimParserUtil extends GeneratedParserUtilBase {
 
 			switch (relevantChar) {
 				case '$':
-					System.out.print("FOUND $\n");
 				case '^':
 					return assignment ? 1 : 10;
 				case '*':
