@@ -4,6 +4,7 @@ package org.nimjet.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import generated.psi.impl.*;
 
 public interface ElementTypes {
@@ -393,4 +394,25 @@ public interface ElementTypes {
 			throw new AssertionError("Unknown element type: " + type);
 		}
 	}
+
+	TokenSet DOC_COMMENTS = TokenSet.create(DOC_BLOCK_COMMENT, DOC_COMMENT);
+	TokenSet STRINGS = TokenSet.create(STRING_LITERAL, CHARACTER_LITERAL, TRIPLESTR_LITERAL);
+	TokenSet KEYWORDS = TokenSet.create(T_ADDR, T_AND, T_AS, T_ASM, T_ATOMIC, T_BIND, T_BLOCK, T_BREAK, T_CASE, T_CAST,
+		T_CONCEPT, T_CONST, T_CONTINUE, T_CONVERTER, T_DEFER, T_DISCARD, T_DISTINCT, T_DIV, T_DO, T_ELIF, T_ELSE, T_END,
+		T_ENUM, T_EXCEPT, T_EXPORT, T_FINALLY, T_FOR, T_FROM, T_FUNC, T_GENERIC, T_IF, T_IMPORT, T_IN, T_INCLUDE,
+		T_INTERFACE, T_IS, T_ISNOT, T_ITERATOR, T_LET, T_MACRO, T_METHOD, T_MIXIN, T_MOD, T_NIL, T_NOT, T_NOTIN, T_OBJECT,
+		T_OF, T_OR, T_OUT, T_PROC, T_PTR, T_RAISE, T_REF, T_RETURN, T_SHL, T_SHR, T_STATIC, T_TEMPLATE, T_TRY, T_TUPLE,
+		T_TYPE, T_USING, T_VAR, T_WHEN, T_WHILE, T_WITH, T_WITHOUT, T_XOR, T_YIELD);
+	TokenSet INTEGER_LITERALS = TokenSet.create(
+		INT64_LITERAL, INT32_LITERAL, INT16_LITERAL, INT8_LITERAL, INT_LITERAL,
+		UINT64_LITERAL, UINT32_LITERAL, UINT16_LITERAL, UINT8_LITERAL, UINT_LITERAL);
+	TokenSet FLOAT_LITERALS = TokenSet.create(FLOAT64_LITERAL, FLOAT32_LITERAL, FLOAT_LITERAL);
+	TokenSet NUMBER_LITERALS = TokenSet.orSet(INTEGER_LITERALS, FLOAT_LITERALS);
+	TokenSet OPERATORS = TokenSet.create(OPERATOR, T_EQ, T_COLON);
+	TokenSet PRAGMAS = TokenSet.create(T_DOTBRACE);
+	TokenSet PARENTHESES = TokenSet.create(T_LPAREN, T_RPAREN);
+	TokenSet BRACKETS = TokenSet.create(T_LBRACKET, T_RBRACKET);
+	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
+	TokenSet PROCS_DEF = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
+	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
 }

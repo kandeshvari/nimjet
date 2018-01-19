@@ -2,12 +2,13 @@
     <id>org.dimcha.nimjet</id>
     <name>NimJet</name>
     <version>0.1.0</version>
-    <vendor email="dk@dimcha.ru" url="http://github.com/kandeshvari/nimjet">NimJet</vendor>
+    <vendor email="dk@dimcha.ru" url="http://github.com/kandeshvari/nimjet">dimcha</vendor>
 
     <description><![CDATA[
       Nim-lang intellij plugin
       <ul>
         <li> file type support </li>
+        <li> basic syntax highlighting </li>
       </ul>
     ]]></description>
 
@@ -28,8 +29,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.nimjet.NimFileTypeFactory"/>
 
+        <!-- parser -->
         <lang.parserDefinition language="Nim" implementationClass="org.nimjet.NimParserDefinition"/>
-        <!-- Add your extensions here -->
+
+        <!-- syntax highlighting -->
+        <lang.syntaxHighlighterFactory language="Nim" implementationClass="org.nimjet.highlighting.NimHighlighterFactory"/>
+        <colorSettingsPage implementation="org.nimjet.highlighting.NimColorSettingsPage"/>
+
     </extensions>
 
     <actions>
