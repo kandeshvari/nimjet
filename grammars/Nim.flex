@@ -81,8 +81,8 @@ OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
 <YYINITIAL> {
   {WHITE_SPACE_CHAR}+ { return WHITE_SPACE; }
 
-  "#[" { yybegin(IN_BLOCK_COMMENT); yypushback(2); System.out.printf("ENTER BLOCK COMMENT\n"); }
-  "##[" { yybegin(IN_DOC_BLOCK_COMMENT); yypushback(2); System.out.printf("ENTER DOC BLOCK COMMENT\n"); }
+  "#[" { yybegin(IN_BLOCK_COMMENT); yypushback(2); }
+  "##[" { yybegin(IN_DOC_BLOCK_COMMENT); yypushback(2); }
 
   {DOC_COMMENT} { System.out.printf("** DOC COMMENT\n"); return DOC_COMMENT; }
   {LINE_COMMENT} { System.out.printf("** LINE COMMENT\n"); return LINE_COMMENT; }
@@ -221,6 +221,7 @@ OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
                     return BLOCK_COMMENT;
               }
             }
+    "##[" { yybegin(IN_DOC_BLOCK_COMMENT); yypushback(2); }
 
     <<EOF>> { blockCommentNestingLevel = 0; yybegin(YYINITIAL); return BLOCK_COMMENT; }
 
@@ -235,6 +236,7 @@ OP_CHAR = [\+\-\*\/\\\<\>\!\?\^\.\|=%&\$@\~:]
                     return DOC_BLOCK_COMMENT;
                }
              }
+    "#[" { yybegin(IN_BLOCK_COMMENT); yypushback(2); }
 
     <<EOF>> { blockCommentNestingLevel = 0; yybegin(YYINITIAL); return DOC_BLOCK_COMMENT; }
 
