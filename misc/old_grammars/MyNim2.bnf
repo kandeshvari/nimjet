@@ -32,6 +32,7 @@ tokens =[
 
     T_EQ='='
     T_COLON=':'
+    T_DOT='.'
     T_OPEN_BRACKET='('
     T_CLOSE_BRACKET=')'
     T_OPEN_SBRACKET='['
@@ -41,13 +42,24 @@ tokens =[
 
 //    CRLF="regexp:\n"
 
+    // literal tokens
+    CHAR_LITERAL="regexp:."
+    HEX_LIT = 'regexp:0[xX][0-9A-Fa-f][0-9A-Fa-f_]*'
+    DEC_LIT = 'regexp:[0-9][0-9_]*'
+    OCT_LIT = 'regexp:0[ocC][0-7][0-7_]*'
+    BIN_LIT = 'regexp:0[bB][01][01_]*'
+    EXPONENT = 'regexp:[Ee][-+]?[0-9][0-9_]*'
+    FLOAT_LITERAL='regexp:[0-9][0-9_]*((.[0-9_]+[Ee][-+]?[0-9][0-9_]*)|[Ee][-+]?[0-9][0-9_]*)'
+    STRING_LITERAL="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
+
+
     space='regexp:\s+'
     id="regexp:\p{Alpha}\w*"
     string="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\\"|\\\'|\\)*\")"
 //    number="regexp:\d{1,}"
     number="regexp:\d+(\.\d+)*"
 //    float="regexp:\d+\.\d+"
-    char='regexp:[a-zA-Z]'
+//    char='regexp:[a-zA-Z]'
     line_comment="regexp:#.*"
     block_comment="regexp:#\[(.|\n)*\]#"]
 }
@@ -61,7 +73,7 @@ meta comma_separated_list ::= <<p>> (T_COMMA <<p>>)*
 private optInd ::= COMMENT?
 private optPar ::= (INDGT | INDEQ)?
 private optPar ::= (INDGT | INDEQ)?
-private indEnd ::= ';'?
+private indEnd ::= T_SEMICOLON?
 
 statement ::= (var_section | let_section | expr)*
 
@@ -78,8 +90,8 @@ invocation ::= ident (T_OPEN_BRACKET? << comma_separated_list expr >>? T_CLOSE_B
 var_ident ::= id
 simple_ident ::= id
 access_ident ::= id (T_OPEN_SBRACKET expr T_CLOSE_SBRACKET)?
-ident ::= (literal '.')? dot_ident | builtin_proc | simple_ident
-dot_ident ::= (array_list | access_ident) ('.' dot_ident)?
+ident ::= (literal T_DOT)? dot_ident | builtin_proc | simple_ident
+dot_ident ::= (array_list | access_ident) (T_DOT dot_ident)?
 
 // literals
 //FLOAT_LIT ::= number
@@ -88,10 +100,11 @@ dot_ident ::= (array_list | access_ident) ('.' dot_ident)?
 //INT16_LIT ::= number
 //STR_LIT ::= string
 //CHAR_LIT ::= "'" char "'"
+INT_LITERAL ::= HEX_LIT | DEC_LIT | OCT_LIT | BIN_LIT
 literal ::= CHAR_LITERAL | INT8_LITERAL  | INT16_LITERAL | INT32_LITERAL | INT64_LITERAL
           | UINT_LITERAL | UINT8_LITERAL | UINT16_LITERAL | UINT32_LITERAL | UINT64_LITERAL
           | FLOAT32_LITERAL | FLOAT64_LITERAL
-          | STR_LITERAL | RSTR_LITERAL | TRIPLESTR_LITERAL
+          | STRING_LITERAL | RSTR_LITERAL | TRIPLESTR_LITERAL
           | T_NIL |  FLOAT_LITERAL | INT_LITERAL
 
 // built-ins
