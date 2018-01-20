@@ -409,7 +409,7 @@ public interface ElementTypes {
 	TokenSet FLOAT_LITERALS = TokenSet.create(FLOAT64_LITERAL, FLOAT32_LITERAL, FLOAT_LITERAL);
 	TokenSet NUMBER_LITERALS = TokenSet.orSet(INTEGER_LITERALS, FLOAT_LITERALS);
 	TokenSet OPERATORS = TokenSet.create(OPERATOR, T_EQ, T_COLON);
-	TokenSet PRAGMAS = TokenSet.create(T_DOTBRACE);
+	TokenSet PRAGMAS = TokenSet.create(T_DOTBRACE, T_BRACEDOT);
 	TokenSet PARENTHESES = TokenSet.create(T_LPAREN, T_RPAREN);
 	TokenSet BRACKETS = TokenSet.create(T_LBRACKET, T_RBRACKET);
 	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
