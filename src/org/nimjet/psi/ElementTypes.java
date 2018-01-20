@@ -13,7 +13,7 @@ public interface ElementTypes {
 	IElementType ASM_STMT = new NimElementType("ASM_STMT");
 	IElementType ASSIGNMENT_EXPR = new NimElementType("ASSIGNMENT_EXPR");
 	IElementType BIND_STMT = new NimElementType("BIND_STMT");
-	IElementType BLOCK = new NimElementType("BLOCK");
+	//	IElementType BLOCK = new NimElementType("BLOCK");
 	IElementType BLOCK_STMT = new NimElementType("BLOCK_STMT");
 	IElementType BRACKET_CTOR = new NimElementType("BRACKET_CTOR");
 	IElementType BRACKET_EXPR = new NimElementType("BRACKET_EXPR");
@@ -205,9 +205,18 @@ public interface ElementTypes {
 	IElementType T_WITH = new NimTokenType("T_WITH");
 	IElementType T_WITHOUT = new NimTokenType("T_WITHOUT");
 
-	IElementType IDENT_OR_LITERAL = new NimTokenType("IDENT_OR_LITERAL");
-	IElementType PRIMARY = new NimTokenType("PRIMARY");
-	IElementType PRIMARY_SUFFIX = new NimTokenType("PRIMARY_SUFFIX");
+	IElementType METHOD_DEF = new NimTokenType("METHOD_DEF");
+	IElementType EXPR_LIST = new NimElementType("EXPR_LIST");
+	IElementType ROUTINE_PARAM_LIST = new NimElementType("ROUTINE_PARAM_LIST");
+	IElementType CASE_BRANCH = new NimElementType("CASE_BRANCH");
+	IElementType ELSE_BRANCH = new NimElementType("ELSE_BRANCH");
+	IElementType ELIF_BRANCH = new NimElementType("EL_IF_BRANCH");
+	IElementType BRACE_EXPR = new NimElementType("BRACE_EXPR");
+	IElementType EXPR_COLON_EQ_EXPR_LIST = new NimElementType("EXPR_COLON_EQ_EXPR_LIST");
+	IElementType ELSE_STMT_BRANCH = new NimElementType("ELSE_STMT_BRANCH");
+	IElementType IDENT_COLON_EQUALS_WITH_PRAGMA = new NimElementType("IDENT_COLON_EQUALS_WITH_PRAGMA");
+	IElementType ROUTINE_IDENTIFIER = new NimElementType("ROUTINE_IDENTIFIER");
+
 
 	class Factory {
 		public static PsiElement createElement(ASTNode node) {
@@ -218,8 +227,8 @@ public interface ElementTypes {
 				return new AssignmentExprImpl(node);
 			} else if (type == BIND_STMT) {
 				return new BindStmtImpl(node);
-			} else if (type == BLOCK) {
-				return new BlockImpl(node);
+//			} else if (type == BLOCK) {
+//				return new BlockImpl(node);
 			} else if (type == BLOCK_STMT) {
 				return new BlockStmtImpl(node);
 			} else if (type == BRACKET_CTOR) {
@@ -382,13 +391,28 @@ public interface ElementTypes {
 				return new WhileStmtImpl(node);
 			} else if (type == YIELD_STMT) {
 				return new YieldStmtImpl(node);
-
-//			} else if (type == IDENT_OR_LITERAL) {
-//				return new IdentOrLiteralImpl(node);
-//			} else if (type == PRIMARY) {
-//				return new PrimaryImpl(node);
-//			} else if (type == PRIMARY_SUFFIX) {
-//				return new PrimarySuffixImpl(node);
+			} else if (type == METHOD_DEF) {
+				return new MethodDefImpl(node);
+			} else if (type == EXPR_LIST) {
+				return new ExprListImpl(node);
+			} else if (type == ROUTINE_PARAM_LIST) {
+				return new RoutineParamListImpl(node);
+			} else if (type == CASE_BRANCH) {
+				return new CaseBranchImpl(node);
+			} else if (type == ELSE_BRANCH) {
+				return new ElseBranchImpl(node);
+			} else if (type == ELIF_BRANCH) {
+				return new ElifBranchImpl(node);
+			} else if (type == BRACE_EXPR) {
+				return new BraceExprImpl(node);
+			} else if (type == EXPR_COLON_EQ_EXPR_LIST) {
+				return new ExprColonEqExprListImpl(node);
+			} else if (type == ELSE_STMT_BRANCH) {
+				return new ElseStmtBranchImpl(node);
+			} else if (type == IDENT_COLON_EQUALS_WITH_PRAGMA) {
+				return new IdentColonEqualsWithPragmaImpl(node);
+			} else if (type == ROUTINE_IDENTIFIER) {
+				return new RoutineIdentifierImpl(node);
 			}
 
 			throw new AssertionError("Unknown element type: " + type);
@@ -409,10 +433,46 @@ public interface ElementTypes {
 	TokenSet FLOAT_LITERALS = TokenSet.create(FLOAT64_LITERAL, FLOAT32_LITERAL, FLOAT_LITERAL);
 	TokenSet NUMBER_LITERALS = TokenSet.orSet(INTEGER_LITERALS, FLOAT_LITERALS);
 	TokenSet OPERATORS = TokenSet.create(OPERATOR, T_EQ, T_COLON);
-	TokenSet PRAGMAS = TokenSet.create(T_DOTBRACE);
+	TokenSet PRAGMAS = TokenSet.create(T_DOTBRACE, T_BRACEDOT);
 	TokenSet PARENTHESES = TokenSet.create(T_LPAREN, T_RPAREN);
 	TokenSet BRACKETS = TokenSet.create(T_LBRACKET, T_RBRACKET);
 	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
-	TokenSet PROCS_DEF = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
+	TokenSet BLOCK_SECT = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
 	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
+
+	/* for aligner */
+	// these expressions should be aligned by first keyword(expression start)
+	TokenSet ALIGNED_EXPRESSIONS = TokenSet.create(IF_EXPR, CASE_EXPR);
+
+	/* for formatter */
+	// blocks starters
+	TokenSet EXPRESSIONS = TokenSet.create(ASSIGNMENT_EXPR, BRACE_EXPR, BRACKET_EXPR, CALL_EXPR, CASE_EXPR, CAST_EXPR, COMMAND_EXPR,
+		DISTINCT_TYPE_EXPR, DOT_EXPR, GROUPED_EXPR, IDENTIFIER_EXPR, IF_EXPR, INFIX_EXPR, PREFIX_EXPR, PROC_EXPR, PROC_TYPE_EXPR,
+		PTR_TYPE_EXPR, REF_TYPE_EXPR, STATIC_TYPE_EXPR, STMT_LIST_EXPR, TUPLE_TYPE_EXPR, VAR_TYPE_EXPR, WHEN_EXPR);
+
+	TokenSet STATEMENTS = TokenSet.create(ASM_STMT, BIND_STMT, BLOCK_STMT, BREAK_STMT, CASE_STMT, CONTINUE_STMT, DISCARD_STMT, EXPR_STMT,
+		FOR_STMT, FROM_STMT, IF_STMT, IMPORT_STMT, INCLUDE_STMT, MIXIN_STMT, PRAGMA_STMT, RAISE_STMT, RETURN_STMT, STATIC_STMT, TRY_STMT,
+		WHEN_STMT, WHILE_STMT, YIELD_STMT);
+
+	TokenSet SECTIONS = TokenSet.create(CONST_SECT, LET_SECT, TYPE_SECT, VAR_SECT);
+
+	TokenSet DEFINITIONS = TokenSet.create(CONST_DEF, ENUM_DEF, IDENTIFIER_DEF, ITERATOR_DEF, MACRO_DEF, METHOD_DEF, OBJECT_DEF,
+		PROC_DEF, TEMPLATE_DEF, TUPLE_DEF, TYPE_DEF, VAR_DEF);
+
+	TokenSet OTHER_BLOCKS = TokenSet.create(TYPE_DESC, CASE_BRANCH, DO_BLOCK, OBJECT_FIELDS, BRACKET_CTOR, ENUM_MEMBER, CTOR_ARG,
+		EXPR_COLON_EQ_EXPR_LIST, ELSE_STMT_BRANCH, ROUTINE_IDENTIFIER);
+
+	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, OTHER_BLOCKS);
+
+	// child tokens that need to indent
+	TokenSet CHILD_TOKENS = TokenSet.create(LITERAL, T_EQ, SET_OR_TABLE_CTOR);
+
+	// avoid extra indentation for these elements
+	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH, DO_BLOCK, ELSE_STMT_BRANCH);
+
+	// extra set for space indents
+	TokenSet ARGS_ALIGNED_BY_FIND = TokenSet.create(OBJECT_CTOR, IDENTIFIER_DEFS);
+	TokenSet ARGS_ALIGNED_BY_ANY_FIRST = TokenSet.create(ROUTINE_PARAM_LIST, EXPR_COLON_EQ_EXPR_LIST);
+	TokenSet UPWARD_PARENTS_ALIGNED = TokenSet.create(EXPR_LIST, TYPE_DESC);
+	/* end formatter sets */
 }

@@ -3,7 +3,6 @@ package org.nimjet.highlighting
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors as Default
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 
@@ -53,7 +52,7 @@ class NimSyntaxHighlighter : SyntaxHighlighterBase() {
 		in ElementTypes.BRACKETS -> BRACKETS
 		in ElementTypes.BRACES -> BRACES
 		in ElementTypes.PARENTHESES -> PARENTHESES
-		in ElementTypes.PROCS_DEF -> FUNCTION_DECLARATION
+		in ElementTypes.BLOCK_SECT -> FUNCTION_DECLARATION
 		in ElementTypes.PROCS_EXPR -> FUNCTION_CALL
 		in ElementTypes.PRAGMAS -> PRAGMA
 
