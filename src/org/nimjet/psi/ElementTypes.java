@@ -415,4 +415,7 @@ public interface ElementTypes {
 	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
 	TokenSet PROCS_DEF = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
 	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
+
+	// for formatter
+	TokenSet BLOCK_DEFS = TokenSet.create(VAR_DEF, CONST_DEF, BLOCK);
 }

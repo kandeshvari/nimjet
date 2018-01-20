@@ -36,6 +36,9 @@
         <lang.syntaxHighlighterFactory language="Nim" implementationClass="org.nimjet.highlighting.NimHighlighterFactory"/>
         <colorSettingsPage implementation="org.nimjet.highlighting.NimColorSettingsPage"/>
 
+        <!-- formatter -->
+        <lang.formatter language="Nim" implementationClass="org.nimjet.formatter.NimFormattingModelBuilder"/>
+
     </extensions>
 
     <actions>
