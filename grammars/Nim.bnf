@@ -101,6 +101,7 @@ private complexOrSimpleStmt ::=
   | StaticStmt
   | AsmStmt
   | ProcDef
+  | MethodDef
   | IteratorDef
   | MacroDef
   | TemplateDef
@@ -155,6 +156,8 @@ private paramListColon ::= params? (&INDNONE colonTypeDesc)?
 private paramListArrow ::= params? (&INDNONE <<arrow>> &OPTIND TypeDesc)?
 
 ProcDef ::= T_PROC routine {pin=1 extends=Statement}
+
+MethodDef ::= T_METHOD routine {pin=1 extends=Statement}
 
 IteratorDef ::= T_ITERATOR routine {pin=1 extends=Statement}
 

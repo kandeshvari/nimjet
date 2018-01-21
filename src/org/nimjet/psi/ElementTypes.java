@@ -205,9 +205,8 @@ public interface ElementTypes {
 	IElementType T_WITH = new NimTokenType("T_WITH");
 	IElementType T_WITHOUT = new NimTokenType("T_WITHOUT");
 
-	IElementType IDENT_OR_LITERAL = new NimTokenType("IDENT_OR_LITERAL");
-	IElementType PRIMARY = new NimTokenType("PRIMARY");
-	IElementType PRIMARY_SUFFIX = new NimTokenType("PRIMARY_SUFFIX");
+	IElementType METHOD_DEF = new NimTokenType("METHOD_DEF");
+
 
 	class Factory {
 		public static PsiElement createElement(ASTNode node) {
@@ -382,15 +381,10 @@ public interface ElementTypes {
 				return new WhileStmtImpl(node);
 			} else if (type == YIELD_STMT) {
 				return new YieldStmtImpl(node);
+			} else if (type == METHOD_DEF) {
+				return new MethodDefImpl(node);
 
-//			} else if (type == IDENT_OR_LITERAL) {
-//				return new IdentOrLiteralImpl(node);
-//			} else if (type == PRIMARY) {
-//				return new PrimaryImpl(node);
-//			} else if (type == PRIMARY_SUFFIX) {
-//				return new PrimarySuffixImpl(node);
 			}
-
 			throw new AssertionError("Unknown element type: " + type);
 		}
 	}
