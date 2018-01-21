@@ -29,8 +29,11 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
                         // NO blank line before object fields
                         .beforeInside(OBJECT_FIELDS, OBJECT_DEF).blankLines(0)
 
-                        // space around `=`
-                        .around(T_EQ).spaceIf(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
+                        // space around `=` in assignment
+                        .aroundInside(T_EQ, ASSIGNMENT_EXPR).spaceIf(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
+
+                        // NO space around `=` in calls
+                        .aroundInside(T_EQ, CALL_EXPR).none()
 
                         // blank line before block sections (`proc`, `type`, ...)
                         .before(BLOCK_SECT).blankLines(1)

@@ -58,6 +58,10 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
         }
 
         override fun getIndent(): Indent? {
+                /**
+                 * need to implement https://nim-lang.org/docs/tut2.html#macros-statement-macros after annotator implementation
+                 * */
+
                 if (node.getUserData(keyAlignment) != null) {
                         println("Parent: %s; El type: %s; aligned: %s; text: %s\n".format(
                                 node.treeParent.elementType.toString(),
@@ -72,26 +76,63 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
                 if (node.treeParent.elementType.toString() == "FILE")
                         return Indent.getNoneIndent()
 
+//                if ((node.elementType == LINE_COMMENT || node.elementType == DOC_COMMENT))
+//                        return null
+
                 // case statement
                 // set continuanion indent for `of` block
                 if ((node.elementType == BLOCK)
                         && node.treeParent != null
                         && (node.treeParent.elementType == CASE_STMT || node.treeParent.elementType == CASE_EXPR)) {
-                        println("CASE BLOCK INDENT: %s; text: %s\n".format(
-                                node.elementType.toString(),
-                                node.text
-                        ))
+//                        println("CASE BLOCK INDENT: %s; text: %s\n".format(
+//                                node.elementType.toString(),
+//                                node.text
+//                        ))
                         return Indent.getContinuationIndent(false)
                 }
 
+                // do not set extra indent for else in `case` stmt
                 if ((node.elementType == T_ELSE)
                         && node.treeParent != null
                         && (node.treeParent.elementType == CASE_STMT || node.treeParent.elementType == CASE_EXPR)) {
-                        println("CASE ELSE INDENT: %s; text: %s\n".format(
-                                node.elementType.toString(),
-                                node.text
-                        ))
+//                        println("CASE ELSE INDENT: %s; text: %s\n".format(
+//                                node.elementType.toString(),
+//                                node.text
+//                        ))
                         return Indent.getNormalIndent()
+                }
+////                fun getFirstElement(parent: ASTNode, elementType: IElementType): ASTNode? {
+////                        var n = parent.firstChildNode
+////                        println("PARENT first childnode: [%s]\n".format(n.elementType.toString()))
+////
+////                        var found: ASTNode? = null
+////                        while (n !== parent) {
+////                                if (n.elementType == elementType)
+////                                        found = n
+////                                println("next childnode: [%s] [%s]\n".format(n.elementType.toString(), n.text))
+////                                n = node.treeNext
+////                        }
+////                        println("FOUND: [%s]\n".format(found?.text))
+////
+////                        return found
+////                }
+//
+//                fun getElementOffset(element: ASTNode, offset: Int): Int {
+////                        element.psi.startOffsetInParent
+////                        println("START OFFSET: [%d] [%s] acc[%d]\n".format(element.psi.startOffsetInParent,
+////                                element.elementType.toString(), offset))
+//                        if (element.treeParent != null
+//                                && element.treeParent.psi != null
+//                                && element.treeParent.psi.startOffsetInParent != 0)
+//                                return getElementOffset(element.treeParent, offset + element.psi.startOffsetInParent)
+//                        return element.startOffset
+//                }
+                // indent params on next line
+                if (node.elementType == CTOR_ARG || node.elementType == IDENTIFIER_DEFS) {
+                        val param = node.treeParent?.findChildByType(node.elementType)
+//                        val elementOffset = getElementOffset(param!!, 0)
+//                        println("PARAM: [%d] [%s]\n".format(elementOffset, param.text))
+                        return Indent.getSpaceIndent(param?.psi?.startOffsetInParent!!, true)
                 }
 
                 // dont set indentation for specific elements (else, elif)
