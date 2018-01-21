@@ -39,6 +39,11 @@
         <!-- formatter -->
         <lang.formatter language="Nim" implementationClass="org.nimjet.formatter.NimFormattingModelBuilder"/>
 
+        <!-- code style -->
+        <codeStyleSettingsProvider implementation="org.nimjet.formatter.NimCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="org.nimjet.formatter.NimLanguageCodeStyleSettingsProvider"/>
+        <fileTypeIndentOptionsProvider implementation="org.nimjet.formatter.NimIndentOptionsProvider"/>
+
     </extensions>
 
     <actions>

@@ -413,9 +413,20 @@ public interface ElementTypes {
 	TokenSet PARENTHESES = TokenSet.create(T_LPAREN, T_RPAREN);
 	TokenSet BRACKETS = TokenSet.create(T_LBRACKET, T_RBRACKET);
 	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
-	TokenSet PROCS_DEF = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
+	TokenSet BLOCK_SECT = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
 	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
 
 	// for formatter
-	TokenSet BLOCK_DEFS = TokenSet.create(VAR_DEF, CONST_DEF, BLOCK);
+	// blocks starters
+	TokenSet EXPRESSIONS = TokenSet.create(CALL_EXPR, ASSIGNMENT_EXPR, PREFIX_EXPR, COMMAND_EXPR, CASE_EXPR);
+	TokenSet STATEMENTS = TokenSet.create(IF_STMT, WHILE_STMT, EXPR_STMT, BLOCK_STMT, TRY_STMT, FOR_STMT, CASE_STMT, EXPR_STMT);
+	TokenSet SECTIONS = TokenSet.create(CONST_SECT, LET_SECT, VAR_SECT, TYPE_SECT);
+	TokenSet DEFINITIONS = TokenSet.create(OBJECT_FIELDS, TYPE_DEF, OBJECT_DEF, PROC_DEF, VAR_DEF);
+	TokenSet TOKENS = TokenSet.create(T_OF);
+
+	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, TOKENS);
+
+	// avoid extra indentation for these elements
+	TokenSet AVOID_INDENT_TOKENS = TokenSet.create(T_ELIF, T_ELSE, T_EXCEPT, T_FINALLY);
+
 }

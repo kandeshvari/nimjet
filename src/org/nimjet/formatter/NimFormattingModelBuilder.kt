@@ -26,26 +26,37 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
 
         private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
                 return SpacingBuilder(settings, NimLanguage)
+                        // NO blank line before object fields
+                        .beforeInside(OBJECT_FIELDS, OBJECT_DEF).blankLines(0)
+
                         // space around `=`
                         .around(T_EQ).spaceIf(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
 
-                        // blank line before `proc`
-                        .before(PROCS_DEF).blankLines(settings.BLANK_LINES_AROUND_CLASS)
+                        // blank line before block sections (`proc`, `type`, ...)
+                        .before(BLOCK_SECT).blankLines(1)
+//                        .before(BLOCK_SECT).blankLines(settings.BLANK_LINES_AROUND_METHOD)
 
                         // NO space before `:`
                         .before(T_COLON).none()
 
+                        // NO space before `:`
+                        .after(T_COLON).spaceIf(settings.SPACE_AFTER_COLON)
+
                         // NO space before `,`
                         .before(T_COMMA).none()
 
-                        // space after `,` in variable definition
-                        .afterInside(T_COLON, VAR_DEF).spaces(1)
+                        // space after `,`
+                        .after(T_COMMA).spaceIf(settings.SPACE_AFTER_COMMA)
 
                         // space between `var` and variable definition
                         .beforeInside(VAR_DEF, VAR_SECT).spaces(1)
 
+                        // space between `type` and variable definition
+                        .beforeInside(TYPE_DEF, TYPE_SECT).spaces(1)
+
                         // space between `proc` and proc definition
                         .beforeInside(IDENTIFIER, PROC_DEF).spaces(1)
+
 
         }
 }
