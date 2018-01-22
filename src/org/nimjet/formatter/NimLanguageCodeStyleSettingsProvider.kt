@@ -41,7 +41,7 @@ class NimLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
         override fun getDefaultCommonSettings() : CommonCodeStyleSettings {
                 val defaultSettings = CommonCodeStyleSettings(NimLanguage)
                 val indentOptions = defaultSettings.initIndentOptions()
-                indentOptions.INDENT_SIZE = 2
+                indentOptions.INDENT_SIZE = 4
                 indentOptions.USE_TAB_CHARACTER = false
                 return defaultSettings
         }

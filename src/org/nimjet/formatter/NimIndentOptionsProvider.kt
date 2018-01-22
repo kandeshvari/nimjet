@@ -13,8 +13,8 @@ class NimIndentOptionsProvider : FileTypeIndentOptionsProvider {
 
         override fun createIndentOptions(): CommonCodeStyleSettings.IndentOptions {
                 val indentOptions = CommonCodeStyleSettings.IndentOptions()
-                indentOptions.INDENT_SIZE = 2
-                indentOptions.TAB_SIZE = 2
+                indentOptions.INDENT_SIZE = 4
+                indentOptions.TAB_SIZE = 4
                 return indentOptions
         }
 
