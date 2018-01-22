@@ -206,6 +206,9 @@ public interface ElementTypes {
 	IElementType T_WITHOUT = new NimTokenType("T_WITHOUT");
 
 	IElementType METHOD_DEF = new NimTokenType("METHOD_DEF");
+	IElementType EXPR_LIST = new NimElementType("EXPR_LIST");
+	IElementType ROUTINE_PARAM_LIST = new NimElementType("ROUTINE_PARAM_LIST");
+	IElementType CASE_BRANCH = new NimElementType("CASE_BRANCH");
 
 
 	class Factory {
@@ -383,8 +386,14 @@ public interface ElementTypes {
 				return new YieldStmtImpl(node);
 			} else if (type == METHOD_DEF) {
 				return new MethodDefImpl(node);
-
+			} else if (type == EXPR_LIST) {
+				return new ExprListImpl(node);
+			} else if (type == ROUTINE_PARAM_LIST) {
+				return new RoutineParamListImpl(node);
+			} else if (type == CASE_BRANCH) {
+				return new CaseBranchImpl(node);
 			}
+
 			throw new AssertionError("Unknown element type: " + type);
 		}
 	}

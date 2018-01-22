@@ -128,8 +128,9 @@ WhileStmt ::= T_WHILE &OPTIND expr T_COLON stmt {pin=1 extends=Statement}
 
 CaseStmt ::= caseStmtOrExpr {extends=Statement}
 private caseStmtOrExpr ::= T_CASE expr T_COLON? (<<indented caseBranches>> | caseBranches) {pin=1}
-private caseBranches ::= (&INDEQ T_OF &OPTIND exprList T_COLON stmt)* (&INDEQ T_ELIF &OPTIND expr T_COLON stmt)* (&INDEQ T_ELSE T_COLON stmt)?
-private exprList ::= <<listOf expr (T_COMMA &OPTIND)>>
+private caseBranches ::= (caseBranch)* (&INDEQ T_ELIF &OPTIND expr T_COLON stmt)* (&INDEQ T_ELSE T_COLON stmt)?
+caseBranch ::= &INDEQ T_OF &OPTIND exprList T_COLON stmt
+exprList ::= <<listOf expr (T_COMMA &OPTIND)>>
 
 TryStmt ::= T_TRY T_COLON stmt (&(INDNONE | INDEQ) T_EXCEPT &OPTIND exprList? T_COLON stmt)*
             (&(INDNONE | INDEQ) T_FINALLY T_COLON stmt)? {pin=1 extends=Statement}
@@ -151,7 +152,9 @@ Pattern ::= T_LBRACE stmt T_RBRACE {pin=1}
 private genericParameters ::= T_LBRACKET &OPTIND <<listOf GenericParam (T_COMMA | T_SEMICOLON)>>? T_RBRACKET {pin=1}
 GenericParam ::= <<listOf ((&IDENT | &ACCENT_QUOTED) IdentifierDef) (T_COMMA &OPTIND)>> (T_COLON &OPTIND expr)? (T_EQ &OPTIND expr)?
 
-private params ::= &INDNONE T_LPAREN &OPTIND <<listOf identColonEqualsWithBothOptionalWithPragma (T_COMMA | T_SEMICOLON)>>? T_RPAREN {pin=2}
+//private params ::= &INDNONE T_LPAREN &OPTIND <<listOf identColonEqualsWithBothOptionalWithPragma (T_COMMA | T_SEMICOLON)>>? T_RPAREN {pin=2}
+private params ::= &INDNONE T_LPAREN &OPTIND routineParamList? T_RPAREN {pin=2}
+routineParamList ::= <<listOf identColonEqualsWithBothOptionalWithPragma (T_COMMA | T_SEMICOLON)>>
 private paramListColon ::= params? (&INDNONE colonTypeDesc)?
 private paramListArrow ::= params? (&INDNONE <<arrow>> &OPTIND TypeDesc)?
 
