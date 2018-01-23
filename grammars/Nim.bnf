@@ -83,7 +83,7 @@ identColonEqualsWithBothOptionalWithPragma ::=
     {elementType=IdentifierDefs}
 
 
-Block ::= <<indented <<listOf complexOrSimpleStmt (T_SEMICOLON (&INDNONE | &INDEQ) | &INDEQ)>>>>
+private Block ::= <<indented <<listOf complexOrSimpleStmt (T_SEMICOLON (&INDNONE | &INDEQ) | &INDEQ)>>>>
     | !<<inSemiStmtList>> <<listOf (&INDNONE simpleStmt) (T_SEMICOLON)>>
     | &<<inSemiStmtList>> simpleStmt
 

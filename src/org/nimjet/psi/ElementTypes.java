@@ -13,7 +13,7 @@ public interface ElementTypes {
 	IElementType ASM_STMT = new NimElementType("ASM_STMT");
 	IElementType ASSIGNMENT_EXPR = new NimElementType("ASSIGNMENT_EXPR");
 	IElementType BIND_STMT = new NimElementType("BIND_STMT");
-	IElementType BLOCK = new NimElementType("BLOCK");
+//	IElementType BLOCK = new NimElementType("BLOCK");
 	IElementType BLOCK_STMT = new NimElementType("BLOCK_STMT");
 	IElementType BRACKET_CTOR = new NimElementType("BRACKET_CTOR");
 	IElementType BRACKET_EXPR = new NimElementType("BRACKET_EXPR");
@@ -220,8 +220,8 @@ public interface ElementTypes {
 				return new AssignmentExprImpl(node);
 			} else if (type == BIND_STMT) {
 				return new BindStmtImpl(node);
-			} else if (type == BLOCK) {
-				return new BlockImpl(node);
+//			} else if (type == BLOCK) {
+//				return new BlockImpl(node);
 			} else if (type == BLOCK_STMT) {
 				return new BlockStmtImpl(node);
 			} else if (type == BRACKET_CTOR) {
@@ -425,19 +425,21 @@ public interface ElementTypes {
 		WHEN_STMT, INFIX_EXPR, IDENTIFIER_EXPR, VAR_TYPE_EXPR);
 
 	TokenSet STATEMENTS = TokenSet.create(IF_STMT, WHILE_STMT, EXPR_STMT, BLOCK_STMT, TRY_STMT, FOR_STMT, CASE_STMT,
-		RETURN_STMT, WHEN_STMT);
+		RETURN_STMT, WHEN_STMT, BREAK_STMT, RAISE_STMT);
 
 	TokenSet SECTIONS = TokenSet.create(CONST_SECT, LET_SECT, VAR_SECT, TYPE_SECT, DO_BLOCK, TYPE_DESC, CASE_BRANCH);
 
 	TokenSet DEFINITIONS = TokenSet.create(OBJECT_FIELDS, TYPE_DEF, OBJECT_DEF, PROC_DEF, VAR_DEF, ITERATOR_DEF, METHOD_DEF, TEMPLATE_DEF,
 		MACRO_DEF, ENUM_DEF, TUPLE_DEF);
 
-	TokenSet TOKENS = TokenSet.create(T_OF, BRACKET_CTOR);
+	TokenSet TOKENS = TokenSet.create(T_OF, BRACKET_CTOR, ENUM_MEMBER);
 
 	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, TOKENS);
 
 	// avoid extra indentation for these elements
 	TokenSet AVOID_INDENT_TOKENS = TokenSet.create(T_ELIF, T_ELSE, T_EXCEPT, T_FINALLY, T_RPAREN/*for parenthesess expression*/,
-		T_RBRACKET/*for ctor expression*/, DO_BLOCK);
+		T_RBRACKET/*for ctor expression*/, DO_BLOCK, IDENTIFIER, IDENT);
+
+	TokenSet SIMPLE_TOKENS = TokenSet.create(IDENTIFIER, IDENT);
 
 }
