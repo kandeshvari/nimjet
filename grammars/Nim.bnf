@@ -128,7 +128,9 @@ WhileStmt ::= T_WHILE &OPTIND expr T_COLON stmt {pin=1 extends=Statement}
 
 CaseStmt ::= caseStmtOrExpr {extends=Statement}
 private caseStmtOrExpr ::= T_CASE expr T_COLON? (<<indented caseBranches>> | caseBranches) {pin=1}
-private caseBranches ::= (caseBranch)* (&INDEQ T_ELIF &OPTIND expr T_COLON stmt)* (&INDEQ T_ELSE T_COLON stmt)?
+private caseBranches ::= (caseBranch)* (elifBranch)* (elseBranch)?
+elseBranch ::= &INDEQ T_ELSE T_COLON stmt
+elifBranch ::= &INDEQ T_ELIF &OPTIND expr T_COLON stmt
 caseBranch ::= &INDEQ T_OF &OPTIND exprList T_COLON stmt
 exprList ::= <<listOf expr (T_COMMA &OPTIND)>>
 
@@ -349,7 +351,7 @@ TupleTypeExpr ::= T_LPAREN <<listOf simpleExpr (T_COMMA)>> T_RPAREN {pin=1}
 
 SetOrTableCtor ::= T_LBRACE &OPTIND (T_COLON | <<listOf exprColonEqExpr (T_COMMA)>>? T_COMMA?) T_RBRACE {extends=Expression}
 
-private primarySuffix ::= &INDNONE (ObjectCtor | CallExpr | &T_DO callWithDoBlocks | BracketExpr | !<<inPragma>> CommandExpr) | DotExpr
+private primarySuffix ::= &INDNONE (ObjectCtor | CallExpr | &T_DO callWithDoBlocks | BracketExpr | BraceExpr | !<<inPragma>> CommandExpr) | DotExpr
 
 left ObjectCtor ::= T_LPAREN &OPTIND namedArgs T_RPAREN {extends=Expression}
 
@@ -360,7 +362,8 @@ DoBlock ::= T_DO paramListArrow (&OPTIND Pragma)? T_COLON stmt {pin=1}
 left CallExpr ::= T_LPAREN exprColonEqExprList T_RPAREN doBlocks {pin=1 extends=Expression}
 
 left BracketExpr ::= T_LBRACKET exprColonEqExprList T_RBRACKET {pin=1 extends=Expression}
-private exprColonEqExprList ::= &OPTIND <<listOf exprColonEqExpr (T_COMMA)>>?
+left BraceExpr ::= T_LBRACE expr T_RBRACE {pin=1 extends=Expression}
+exprColonEqExprList ::= &OPTIND <<listOf exprColonEqExpr (T_COMMA)>>?
 private exprColonEqExpr ::= expr (T_COLON expr | T_EQ expr)?
 
 left CommandExpr ::= &(IDENT | Literal | ACCENT_QUOTED | T_NIL | T_CAST | T_ADDR | T_TYPE | OPERATOR) expr {extends=Expression}

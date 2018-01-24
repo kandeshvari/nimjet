@@ -13,7 +13,7 @@ public interface ElementTypes {
 	IElementType ASM_STMT = new NimElementType("ASM_STMT");
 	IElementType ASSIGNMENT_EXPR = new NimElementType("ASSIGNMENT_EXPR");
 	IElementType BIND_STMT = new NimElementType("BIND_STMT");
-//	IElementType BLOCK = new NimElementType("BLOCK");
+	//	IElementType BLOCK = new NimElementType("BLOCK");
 	IElementType BLOCK_STMT = new NimElementType("BLOCK_STMT");
 	IElementType BRACKET_CTOR = new NimElementType("BRACKET_CTOR");
 	IElementType BRACKET_EXPR = new NimElementType("BRACKET_EXPR");
@@ -209,6 +209,10 @@ public interface ElementTypes {
 	IElementType EXPR_LIST = new NimElementType("EXPR_LIST");
 	IElementType ROUTINE_PARAM_LIST = new NimElementType("ROUTINE_PARAM_LIST");
 	IElementType CASE_BRANCH = new NimElementType("CASE_BRANCH");
+	IElementType ELSE_BRANCH = new NimElementType("ELSE_BRANCH");
+	IElementType ELIF_BRANCH = new NimElementType("EL_IF_BRANCH");
+	IElementType BRACE_EXPR = new NimElementType("BRACE_EXPR");
+	IElementType EXPR_COLON_EQ_EXPR_LIST = new NimElementType("EXPR_COLON_EQ_EXPR_LIST");
 
 
 	class Factory {
@@ -392,6 +396,14 @@ public interface ElementTypes {
 				return new RoutineParamListImpl(node);
 			} else if (type == CASE_BRANCH) {
 				return new CaseBranchImpl(node);
+			} else if (type == ELSE_BRANCH) {
+				return new ElseBranchImpl(node);
+			} else if (type == ELIF_BRANCH) {
+				return new ElifBranchImpl(node);
+			} else if (type == BRACE_EXPR) {
+				return new BraceExprImpl(node);
+			} else if (type == EXPR_COLON_EQ_EXPR_LIST) {
+				return new ExprColonEqExprListImpl(node);
 			}
 
 			throw new AssertionError("Unknown element type: " + type);
@@ -419,27 +431,39 @@ public interface ElementTypes {
 	TokenSet BLOCK_SECT = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
 	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
 
-	// for formatter
+	/* for aligner */
+	// these expressions should be aligned by first keyword(expression start)
+	TokenSet ALIGNED_EXPRESSIONS = TokenSet.create(IF_EXPR, CASE_EXPR);
+
+	/* for formatter */
 	// blocks starters
-	TokenSet EXPRESSIONS = TokenSet.create(CALL_EXPR, ASSIGNMENT_EXPR, PREFIX_EXPR, COMMAND_EXPR, CASE_EXPR, PROC_EXPR, STMT_LIST_EXPR,
-		WHEN_STMT, INFIX_EXPR, IDENTIFIER_EXPR, VAR_TYPE_EXPR);
+	TokenSet EXPRESSIONS = TokenSet.create(ASSIGNMENT_EXPR, BRACE_EXPR, BRACKET_EXPR, CALL_EXPR, CASE_EXPR, CAST_EXPR, COMMAND_EXPR,
+		DISTINCT_TYPE_EXPR, DOT_EXPR, GROUPED_EXPR, IDENTIFIER_EXPR, IF_EXPR, INFIX_EXPR, PREFIX_EXPR, PROC_EXPR, PROC_TYPE_EXPR,
+		PTR_TYPE_EXPR, REF_TYPE_EXPR, STATIC_TYPE_EXPR, STMT_LIST_EXPR, TUPLE_TYPE_EXPR, VAR_TYPE_EXPR, WHEN_EXPR);
 
-	TokenSet STATEMENTS = TokenSet.create(IF_STMT, WHILE_STMT, EXPR_STMT, BLOCK_STMT, TRY_STMT, FOR_STMT, CASE_STMT,
-		RETURN_STMT, WHEN_STMT, BREAK_STMT, RAISE_STMT);
+	TokenSet STATEMENTS = TokenSet.create(ASM_STMT, BIND_STMT, BLOCK_STMT, BREAK_STMT, CASE_STMT, CONTINUE_STMT, DISCARD_STMT, EXPR_STMT,
+		FOR_STMT, FROM_STMT, IF_STMT, IMPORT_STMT, INCLUDE_STMT, MIXIN_STMT, PRAGMA_STMT, RAISE_STMT, RETURN_STMT, STATIC_STMT, TRY_STMT,
+		WHEN_STMT, WHILE_STMT, YIELD_STMT);
 
-	TokenSet SECTIONS = TokenSet.create(CONST_SECT, LET_SECT, VAR_SECT, TYPE_SECT, DO_BLOCK, TYPE_DESC, CASE_BRANCH);
+	TokenSet SECTIONS = TokenSet.create(CONST_SECT, LET_SECT, TYPE_SECT, VAR_SECT);
 
-	TokenSet DEFINITIONS = TokenSet.create(OBJECT_FIELDS, TYPE_DEF, OBJECT_DEF, PROC_DEF, VAR_DEF, ITERATOR_DEF, METHOD_DEF, TEMPLATE_DEF,
-		MACRO_DEF, ENUM_DEF, TUPLE_DEF);
+	TokenSet DEFINITIONS = TokenSet.create(CONST_DEF, ENUM_DEF, IDENTIFIER_DEF, ITERATOR_DEF, MACRO_DEF, METHOD_DEF, OBJECT_DEF,
+		PROC_DEF, TEMPLATE_DEF, TUPLE_DEF, TYPE_DEF, VAR_DEF);
 
-	TokenSet TOKENS = TokenSet.create(T_OF, BRACKET_CTOR, ENUM_MEMBER);
+	TokenSet OTHER_BLOCKS = TokenSet.create(TYPE_DESC, CASE_BRANCH, DO_BLOCK, OBJECT_FIELDS, BRACKET_CTOR, ENUM_MEMBER, CTOR_ARG,
+		EXPR_COLON_EQ_EXPR_LIST);
 
-	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, TOKENS);
+	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, OTHER_BLOCKS);
+
+	// child tokens that need to indent
+	TokenSet CHILD_TOKENS = TokenSet.create(LITERAL, T_EQ, SET_OR_TABLE_CTOR);
 
 	// avoid extra indentation for these elements
-	TokenSet AVOID_INDENT_TOKENS = TokenSet.create(T_ELIF, T_ELSE, T_EXCEPT, T_FINALLY, T_RPAREN/*for parenthesess expression*/,
-		T_RBRACKET/*for ctor expression*/, DO_BLOCK, IDENTIFIER, IDENT);
+	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH);
 
-	TokenSet SIMPLE_TOKENS = TokenSet.create(IDENTIFIER, IDENT);
+	//	TokenSet AVOID_INDENT_TOKENS = TokenSet.create(T_ELIF, T_ELSE, T_EXCEPT, T_FINALLY, T_RPAREN/*for parenthesess expression*/,
+//		T_RBRACKET/*for ctor expression*/, DO_BLOCK, IDENTIFIER, IDENT);
+//
+//	TokenSet SIMPLE_TOKENS = TokenSet.create(IDENTIFIER, IDENT);
 
 }

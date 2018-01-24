@@ -11,6 +11,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import org.nimjet.NimParserDefinition.Companion.COMMENTS
 import org.nimjet.NimParserDefinition.Companion.FILE
+import org.nimjet.NimParserDefinition.Companion.WHITE_SPACES
 import java.util.ArrayList
 
 
@@ -38,7 +39,8 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 	 */
 	private fun decideAlignment(node: ASTNode): Alignment? {
 		// if we have `\n` before node - align child elements by this node
-		return if (node.treePrev != null && node.treePrev.textContains('\n')) {
+		return if ((node.treePrev != null && node.treePrev.textContains('\n')
+				|| node.elementType in ALIGNED_EXPRESSIONS )) {
 			Alignment.createAlignment()
 		} else
 			null
@@ -80,10 +82,10 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 		 * */
 
 		fun directChildOf(elementType: IElementType, parentIElementType: IElementType): Boolean =
-			node.elementType == elementType && node.treeParent != null && node.treeParent.elementType == parentIElementType
+			node.elementType == elementType && node.treeParent?.elementType == parentIElementType
 
 		fun directChildOf(elementType: IElementType, parentIElementTypes: TokenSet): Boolean =
-			node.elementType == elementType && node.treeParent != null && node.treeParent.elementType in parentIElementTypes
+			node.elementType == elementType && node.treeParent?.elementType in parentIElementTypes
 
 		fun upwardChildOf(elementType: IElementType, parentIElementType: IElementType): Boolean {
 			if (node.elementType == elementType) {
@@ -107,41 +109,6 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 			return false
 		}
 
-//		if (node.getUserData(keyAlignment) != null) {
-//			println("Parent: %s; El type: %s; aligned: %s; text: %s\n".format(
-//				node.treeParent.elementType.toString(),
-//				node.elementType.toString(),
-//				(node.getUserData(keyAlignment) != null).toString(),
-//				node.text
-//			))
-//		}
-
-//
-		// do not set indent on top-level elements
-		if (node.treeParent?.elementType == FILE) {
-			println("NONE: ${node.elementType} (${node.treeParent?.elementType})")
-			return Indent.getNoneIndent()
-		}
-
-
-
-		if (node.treePrev != null) {
-			println("PREV: ${node.elementType} (${node.treePrev.elementType})")
-
-		}
-
-		if (node.elementType in COMMENTS) {
-			return Indent.getNormalIndent()
-		}
-
-		if (node.elementType in BLOCK_START_TOKENS && node.treePrev != null && node.treePrev.textContains('\n')) {
-			println("NORMAL: ${node.elementType} (${node.treeParent?.elementType})")
-			return Indent.getNormalIndent()
-		}
-
-		/* indent continuation lists
-		* test1: indent_continuation_lists.nim
-		* */
 		fun spaceIndent(elementType: IElementType? = null, relativeToDirectParent: Boolean = true): Indent {
 			return if (elementType == null) {
 				Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, relativeToDirectParent)
@@ -150,202 +117,116 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 			}
 		}
 
-		val parents = TokenSet.create(IF_EXPR, TYPE_DESC, PREFIX_EXPR, EXPR_LIST, IDENTIFIER_DEFS, COMMAND_EXPR, ROUTINE_PARAM_LIST)
-		if (upwardChildOf(node.elementType, parents))
-			return spaceIndent()
+		// check is newline exists up till parent
+		fun hasUpwardNewLine(): Boolean {
+			var p = node.treePrev
+			while (p != null){
+				if (p.elementType in WHITE_SPACES && p.textContains('\n')) return true
+				p = p.treePrev
+			}
+			return false
+		}
 
-		val parentsAligned = TokenSet.create(OBJECT_CTOR, BRACKET_CTOR)
-		if (upwardChildOf(node.elementType, parentsAligned))
+		// do not set indent on top-level elements
+		if (node.treeParent?.elementType == FILE) {
+			return Indent.getNoneIndent()
+		}
+
+
+		// indent comments within parent block
+		if (node.elementType in COMMENTS) {
+			return Indent.getNormalIndent()
+		}
+
+		/* indent continuation lists */
+		val parentsAligned = TokenSet.create(OBJECT_CTOR)
+		if (directChildOf(node.elementType, parentsAligned))
 			return spaceIndent(node.elementType)
 
-
-		if (upwardChildOf(node.elementType, TYPE_DESC)) {
-			println("FOUND CHILD OF TYPE_DESC: ${node.elementType} " +
-				"indent: ${node.treeParent.firstChildNode.psi.startOffsetInParent.toString()} " +
-				"text:[${node.text}]")
-			return spaceIndent()
-		}
-
-		if (directChildOf(IDENTIFIER_EXPR, EXPR_LIST))
-			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-
 		if (directChildOf(STMT_LIST_EXPR, EXPR_LIST))
-			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, false)
+			return spaceIndent()
 
-		if (directChildOf(COMMAND_EXPR, EXPR_LIST))
-			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-
-
-		if (directChildOf(node.elementType, EXPR_LIST))
-			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
+		// TODO: settings UI
+		if (directChildOf(node.elementType, EXPR_COLON_EQ_EXPR_LIST))
+			return spaceIndent()
 
 
-		if (directChildOf(node.elementType, IDENTIFIER_DEFS))
-			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-
-
-		if (node.elementType == CTOR_ARG || node.elementType == IDENTIFIER_DEFS) {
-			val param = node.treeParent?.findChildByType(node.elementType)
-			return Indent.getSpaceIndent(param?.psi?.startOffsetInParent!!, true)
-		}
 		/* end indent continuation lists */
 
 
-//		if (directChildOf(node.elementType, BLOCK_START_TOKENS) || directChildOf(node.elementType, BLOCK)) {
-////			if(node.elementType in KEYWORDS) {
-////				println("NONE: KW: ${node.elementType} (${node.treeParent?.elementType})")
-////				return Indent.getNoneIndent()
-////			}
-////
-////			if(node.elementType in SIMPLE_TOKENS) {
-////				println("NONE: SIMPLE: ${node.elementType} (${node.treeParent?.elementType})")
-////				return Indent.getNoneIndent()
-////			}
-//
-////			if(node.elementType in STATEMENTS) {
-////				println("NONE: STATEMENT: ${node.elementType} (${node.treeParent?.elementType})")
-////				return Indent.getNoneIndent()
-////			}
+		/* mass indent */
+		// don't indent special cases
+		if (directChildOf(T_ELSE, IF_EXPR))
+			return Indent.getNoneIndent()
 
-//			if (node.elementType != BLOCK &&
-//				(node.elementType in BLOCK_START_TOKENS)) {
-//				println("NORMAL: ${node.elementType} (${node.treeParent?.elementType})")
-//				return Indent.getNormalIndent()
-//			}
+		// don't indent `of`, `elif`, `else` branches
+		if (node.elementType in AVOID_INDENT)
+			return Indent.getNoneIndent()
 
-//			if (node.treePrev != null && node.treePrev.textContains('\n')) {
-//				println("NORMAL: ${node.elementType} (${node.treeParent?.elementType})")
-//				return Indent.getNormalIndent()
-//			}
-//		}
-//
-//		if (directChildOf(node.elementType, IF_STMT))
-//			return Indent.getNormalIndent()
 
-//		if (node.elementType == BLOCK || && directChildOf(node.elementType, BLOCK_STMT))
+		// indent true blocks (block, if, let, var, ...)
+		if (node.elementType in BLOCK_START_TOKENS && node.treePrev != null && node.treePrev.textContains('\n')) {
+			return Indent.getNormalIndent()
+		}
+
+		// indent child elements if need
+		if (node.elementType in CHILD_TOKENS && node.treePrev != null && node.treePrev.textContains('\n')) {
+			return Indent.getNormalIndent()
+		}
+
+
+
+
+
+		/* indent continuation lists
+		* test1: formatter.nim
+		* */
 
 //
-////                if ((node.elementType == LINE_COMMENT || node.elementType == DOC_COMMENT))
-////                        return null
 //
-//		// case statement
-//		// set continuanion indent for `of` block
-//		if ((node.elementType == BLOCK)
-//			&& node.treeParent != null
-//			&& (node.treeParent.elementType == CASE_STMT || node.treeParent.elementType == CASE_EXPR)) {
-////                        println("CASE BLOCK INDENT: %s; text: %s\n".format(
-////                                node.elementType.toString(),
-////                                node.text
-////                        ))
-//			return Indent.getContinuationIndent(false)
-//		}
+//		val parents = TokenSet.create(VAR_DEF, CONST_DEF, IF_EXPR, TYPE_DESC, PREFIX_EXPR, EXPR_LIST, IDENTIFIER_DEFS, COMMAND_EXPR, ROUTINE_PARAM_LIST)
+////		if (directChildOf(node.elementType, parents) && hasUpwardNewLine())
+////			return Indent.getNormalIndent()
 //
-//		// do not set extra indent for else in `case` stmt
-//		if ((node.elementType == T_ELSE)
-//			&& node.treeParent != null
-//			&& (node.treeParent.elementType == CASE_STMT || node.treeParent.elementType == CASE_EXPR)) {
-////                        println("CASE ELSE INDENT: %s; text: %s\n".format(
-////                                node.elementType.toString(),
-////                                node.text
-////                        ))
-//			return Indent.getNormalIndent()
-//		}
-//
-//		/* indent continuation lists
-//		* test1: indent_continuation_lists.nim
-//		* */
-//		fun directChildOf(elementType: IElementType, parentIElementType: IElementType): Boolean =
-//			node.elementType == elementType && node.treeParent != null && node.treeParent.elementType == parentIElementType
-//
-//		fun directChildOf(elementType: IElementType, parentIElementTypes: TokenSet): Boolean =
-//			node.elementType == elementType && node.treeParent != null && node.treeParent.elementType in parentIElementTypes
-//
-//		fun upwardChildOf(elementType: IElementType, parentIElementType: IElementType): Boolean {
-//			if (node.elementType == elementType) {
-//				var p = node.treeParent
-//				while (p != null ) {
-//					if (p.elementType == parentIElementType) return true
-//					p = p.treeParent
-//				}
-//			}
-//			return false
-//		}
-//
-//		fun upwardChildOf(elementType: IElementType, parentIElementTypes: TokenSet): Boolean {
-//			if (node.elementType == elementType) {
-//				var p = node.treeParent
-//				while (p != null ) {
-//					if (p.elementType in parentIElementTypes) return true
-//					p = p.treeParent
-//				}
-//			}
-//			return false
-//		}
-//
-//		fun spaceIndent(elementType: IElementType? = null, relativeToDirectParent: Boolean = true): Indent {
-//			return if (elementType == null) {
-//				Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, relativeToDirectParent)
-//			} else {
-//				Indent.getSpaceIndent(node.treeParent.findChildByType(elementType)!!.psi.startOffsetInParent, relativeToDirectParent)
-//			}
-//		}
-//
-//		val parents = TokenSet.create(IF_EXPR, TYPE_DESC, PREFIX_EXPR, EXPR_LIST, IDENTIFIER_DEFS, COMMAND_EXPR, ROUTINE_PARAM_LIST)
 //		if (upwardChildOf(node.elementType, parents))
 //			return spaceIndent()
 //
-//		val parentsAligned = TokenSet.create(OBJECT_CTOR)
-//		if (upwardChildOf(node.elementType, parentsAligned))
-//			return spaceIndent(node.elementType)
 //
 //
-////		if (upwardChildOf(node.elementType, TYPE_DESC)) {
-////			println("FOUND CHILD OF TYPE_DESC: ${node.elementType} " +
-////				"indent: ${node.treeParent.firstChildNode.psi.startOffsetInParent.toString()} " +
-////				"text:[${node.text}]")
-////			return spaceIndent()
-////		}
-//
-////		if (directChildOf(IDENTIFIER_EXPR, EXPR_LIST))
-////			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-////
-////		if (directChildOf(COMMAND_EXPR, EXPR_LIST))
-////			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-//
-////
-////		if (directChildOf(node.elementType, EXPR_LIST))
-////			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-////
-////
-////		if (directChildOf(node.elementType, IDENTIFIER_DEFS))
-////			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
-////
-////
-////		if (node.elementType == CTOR_ARG || node.elementType == IDENTIFIER_DEFS) {
-////			val param = node.treeParent?.findChildByType(node.elementType)
-////			return Indent.getSpaceIndent(param?.psi?.startOffsetInParent!!, true)
-////		}
-//		/* end indent continuation lists */
-//
-//		// dont set indentation for specific elements (else, elif)
-//		if (node.elementType in AVOID_INDENT_TOKENS)
-//			return Indent.getNoneIndent()
-//
-//		// general block indent
-//		if (node.treeParent != null && node.treePrev != null
-//			&& node.treeParent.elementType in BLOCK_START_TOKENS
-//			&& node.treePrev.textContains('\n')) {
-//			println("INDENT: %s; text: %s\n".format(
-//				node.elementType.toString(),
-//				node.text
-//			))
-//			return Indent.getNormalIndent()
+//		if (upwardChildOf(node.elementType, TYPE_DESC)) {
+//			println("FOUND CHILD OF TYPE_DESC: ${node.elementType} " +
+//				"indent: ${node.treeParent.firstChildNode.psi.startOffsetInParent.toString()} " +
+//				"text:[${node.text}]")
+//			return spaceIndent()
 //		}
 //
-		// Don't indent others
+//		if (directChildOf(IDENTIFIER_EXPR, EXPR_LIST))
+//			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
+//
+//		if (directChildOf(STMT_LIST_EXPR, EXPR_LIST))
+//			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, false)
+//
+//		if (directChildOf(COMMAND_EXPR, EXPR_LIST))
+//			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
+//
+//
+//		if (directChildOf(node.elementType, EXPR_LIST))
+//			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
+//
+//
+//		if (directChildOf(node.elementType, IDENTIFIER_DEFS))
+//			return Indent.getSpaceIndent(node.treeParent.firstChildNode.psi.startOffsetInParent, true)
+//
+//
+//		if (node.elementType == CTOR_ARG || node.elementType == IDENTIFIER_DEFS) {
+//			val param = node.treeParent?.findChildByType(node.elementType)
+//			return Indent.getSpaceIndent(param?.psi?.startOffsetInParent!!, true)
+//		}
+//		/* end indent continuation lists */
 
-		println("NONE: ${node.elementType} (${node.treeParent?.elementType})")
+
+		// Don't indent others
+//		println("NONE: ${node.elementType} (${node.treeParent?.elementType})")
 		return Indent.getNoneIndent()
-//		return Indent.getNormalIndent()
 	}
 }
