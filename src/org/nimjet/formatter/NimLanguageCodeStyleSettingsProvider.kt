@@ -33,8 +33,8 @@ class NimLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
 
                 }
                 else if (settingsType == LanguageCodeStyleSettingsProvider.SettingsType.BLANK_LINES_SETTINGS) {
-                        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
                         consumer.showStandardOptions("KEEP_LINE_BREAKS")
+                        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
                         consumer.showStandardOptions("KEEP_BLANK_LINES_IN_DECLARATIONS")
                         consumer.showStandardOptions("BLANK_LINES_AROUND_METHOD")
                         consumer.renameStandardOption("BLANK_LINES_AROUND_METHOD", "Lines before procs")
@@ -47,6 +47,10 @@ class NimLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                 indentOptions.CONTINUATION_INDENT_SIZE = 4
                 indentOptions.TAB_SIZE = 4
                 indentOptions.USE_TAB_CHARACTER = false
+
+	        defaultSettings.KEEP_BLANK_LINES_IN_CODE = 1
+	        defaultSettings.KEEP_BLANK_LINES_IN_DECLARATIONS = 0
+
                 return defaultSettings
         }
 
@@ -59,15 +63,15 @@ class NimIndentOptionsEditor : IndentOptionsEditor() {
         override fun addComponents() {
                 super.addComponents()
                 myCbUseTab.isEnabled = false;
-                myTabSizeLabel.isEnabled = true
-                myTabSizeField.isEnabled = true
+                myTabSizeLabel.isEnabled = false
+                myTabSizeField.isEnabled = false
                 myIndentLabel.isEnabled = true
                 myIndentField.isEnabled = true
 
-                myTabSizeLabel.isVisible = true
-                myTabSizeField.isVisible = true
-                myIndentLabel.isVisible = true
-                myIndentField.isVisible = true
+//                myTabSizeLabel.isVisible = false
+//                myTabSizeField.isVisible = false
+//                myIndentLabel.isVisible = true
+//                myIndentField.isVisible = true
         }
 
         override fun setEnabled(enabled: Boolean) {

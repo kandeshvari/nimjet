@@ -34,6 +34,9 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
                         // NO blank line before `var`/`const`/`let` definition
 	                .between(VAR_DEF, VAR_DEF).blankLines(0)
 
+	                // NO blank lines before no-indent tokens
+	                .before(AVOID_INDENT).blankLines(0)
+
                         // space around `=` in assignment
                         .aroundInside(T_EQ, ASSIGNMENT_EXPR).spaceIf(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
 
@@ -41,8 +44,7 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
                         .aroundInside(T_EQ, CALL_EXPR).none()
 
                         // blank line before block sections (`proc`, `type`, ...)
-	                .around(PROC_DEF).blankLines(settings.BLANK_LINES_AROUND_METHOD) // not work :(
-
+	                .before(PROC_DEF).blankLines(settings.BLANK_LINES_AROUND_METHOD)
 
                         // NO space before `:`
                         .before(T_COLON).none()
