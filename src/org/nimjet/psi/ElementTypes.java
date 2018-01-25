@@ -462,7 +462,8 @@ public interface ElementTypes {
 	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH, DO_BLOCK);
 
 	// extra set for space indents
-	TokenSet DIRECT_PARENTS_ALIGNED = TokenSet.create(OBJECT_CTOR, ROUTINE_PARAM_LIST, IDENTIFIER_DEFS, EXPR_COLON_EQ_EXPR_LIST);
+	TokenSet ARGS_ALIGNED_BY_FIND = TokenSet.create(OBJECT_CTOR, IDENTIFIER_DEFS);
+	TokenSet ARGS_ALIGNED_BY_ANY_FIRST = TokenSet.create(ROUTINE_PARAM_LIST, EXPR_COLON_EQ_EXPR_LIST);
 	TokenSet UPWARD_PARENTS_ALIGNED = TokenSet.create(EXPR_LIST, TYPE_DESC);
 	/* end formatter sets */
 }

@@ -111,7 +111,12 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 			return if (elementType == null) {
 				Indent.getSpaceIndent(parent.firstChildNode.psi.startOffsetInParent, relativeToDirectParent)
 			} else {
-				Indent.getSpaceIndent(parent.findChildByType(elementType)!!.psi.startOffsetInParent, relativeToDirectParent)
+				val firstChildByType = parent.findChildByType(elementType)
+				if (firstChildByType != null ) {
+					Indent.getSpaceIndent(firstChildByType.psi.startOffsetInParent, relativeToDirectParent)
+				} else {
+					Indent.getSpaceIndent(parent.firstChildNode.psi.startOffsetInParent, relativeToDirectParent)
+				}
 			}
 		}
 
@@ -130,13 +135,19 @@ class NimBlock(node: ASTNode, wrap: Wrap?, alignment: Alignment?, sb: SpacingBui
 
 		/* direct childen */
 		// TODO: settings UI
-		if (directChildOf(currentElementType, DIRECT_PARENTS_ALIGNED))
-//			return spaceIndent(currentElementType)
+		if (directChildOf(currentElementType, ARGS_ALIGNED_BY_FIND))
+			// find first element of currentElementType in parent(ARGS_ALIGNED_BY_FIND) and indent by it
+			return spaceIndent(currentElementType)
+
+		// TODO: settings UI
+		if (directChildOf(currentElementType, ARGS_ALIGNED_BY_ANY_FIRST))
+			// just indent by first parent(ARGS_ALIGNED_BY_ANY_FIRST) child
 			return spaceIndent()
 
 		/* upward children */
 		// TODO: settings UI
 		if (upwardChildOf(currentElementType, UPWARD_PARENTS_ALIGNED))
+			// do indent by first parent child if we are sub-child of UPWARD_PARENTS_ALIGNED... uhh, weird :(
 			return spaceIndent()
 
 		/* end indent continuation lists */
