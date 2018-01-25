@@ -459,11 +459,10 @@ public interface ElementTypes {
 	TokenSet CHILD_TOKENS = TokenSet.create(LITERAL, T_EQ, SET_OR_TABLE_CTOR);
 
 	// avoid extra indentation for these elements
-	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH);
+	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH, DO_BLOCK);
 
-	//	TokenSet AVOID_INDENT_TOKENS = TokenSet.create(T_ELIF, T_ELSE, T_EXCEPT, T_FINALLY, T_RPAREN/*for parenthesess expression*/,
-//		T_RBRACKET/*for ctor expression*/, DO_BLOCK, IDENTIFIER, IDENT);
-//
-//	TokenSet SIMPLE_TOKENS = TokenSet.create(IDENTIFIER, IDENT);
-
+	// extra set for space indents
+	TokenSet DIRECT_PARENTS_ALIGNED = TokenSet.create(OBJECT_CTOR, ROUTINE_PARAM_LIST, IDENTIFIER_DEFS, EXPR_COLON_EQ_EXPR_LIST);
+	TokenSet UPWARD_PARENTS_ALIGNED = TokenSet.create(EXPR_LIST, TYPE_DESC);
+	/* end formatter sets */
 }
