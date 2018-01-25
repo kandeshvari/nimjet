@@ -24,10 +24,15 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
                                 settings)
         }
 
+	/**
+	 * see https://github.com/JetBrains/intellij-community/blob/master/platform/lang-api/src/com/intellij/formatting/SpacingBuilder.java
+	 * for side efefects :(
+	 * **/
         private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
                 return SpacingBuilder(settings, NimLanguage)
-                        // NO blank line before object fields
-                        .beforeInside(OBJECT_FIELDS, OBJECT_DEF).blankLines(0)
+
+                        // NO blank line before `var`/`const`/`let` definition
+	                .between(VAR_DEF, VAR_DEF).blankLines(0)
 
                         // space around `=` in assignment
                         .aroundInside(T_EQ, ASSIGNMENT_EXPR).spaceIf(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
@@ -36,14 +41,33 @@ class NimFormattingModelBuilder : FormattingModelBuilder {
                         .aroundInside(T_EQ, CALL_EXPR).none()
 
                         // blank line before block sections (`proc`, `type`, ...)
-                        .before(BLOCK_SECT).blankLines(1)
-//                        .before(BLOCK_SECT).blankLines(settings.BLANK_LINES_AROUND_METHOD)
+	                .around(PROC_DEF).blankLines(settings.BLANK_LINES_AROUND_METHOD) // not work :(
+
 
                         // NO space before `:`
                         .before(T_COLON).none()
 
                         // NO space before `:`
                         .after(T_COLON).spaceIf(settings.SPACE_AFTER_COLON)
+
+                        // NO space after '('
+                        .after(T_LPAREN).none()
+
+                        // NO space before ')'
+                        .before(T_RPAREN).none()
+
+                        // NO space after '['
+                        .after(T_LBRACKET).none()
+
+                        // NO space before ']'
+                        .before(T_RBRACKET).none()
+
+                        // NO space after '{'
+                        .after(T_LBRACE).none()
+
+                        // NO space before '}'
+                        .before(T_RBRACE).none()
+
 
                         // NO space before `,`
                         .before(T_COMMA).none()

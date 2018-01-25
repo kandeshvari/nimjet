@@ -33,9 +33,11 @@ class NimLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
 
                 }
                 else if (settingsType == LanguageCodeStyleSettingsProvider.SettingsType.BLANK_LINES_SETTINGS) {
-//                        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
+                        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE")
+                        consumer.showStandardOptions("KEEP_LINE_BREAKS")
+                        consumer.showStandardOptions("KEEP_BLANK_LINES_IN_DECLARATIONS")
                         consumer.showStandardOptions("BLANK_LINES_AROUND_METHOD")
-                        consumer.renameStandardOption("BLANK_LINES_AROUND_METHOD", "Lines before block")
+                        consumer.renameStandardOption("BLANK_LINES_AROUND_METHOD", "Lines before procs")
                 }
         }
         override fun getDefaultCommonSettings() : CommonCodeStyleSettings {
