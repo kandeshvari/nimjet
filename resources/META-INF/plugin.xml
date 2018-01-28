@@ -43,7 +43,8 @@
         <codeStyleSettingsProvider implementation="org.nimjet.formatter.NimCodeStyleSettingsProvider"/>
         <langCodeStyleSettingsProvider implementation="org.nimjet.formatter.NimLanguageCodeStyleSettingsProvider"/>
         <fileTypeIndentOptionsProvider implementation="org.nimjet.formatter.NimIndentOptionsProvider"/>
-
+        <!-- disable smart unindent -->
+        <editor.backspaceModeOverride language="Nim" implementationClass="com.intellij.codeInsight.editorActions.SmartBackspaceDisabler"/>
     </extensions>
 
     <actions>

@@ -29,7 +29,7 @@ external INDGT ::= indGt
 external INDNONE ::= indNone
 external OPTIND ::= indOpt
 
-private meta listOf ::= <<p1>> (<<p2>> <<p1>>)*
+private meta listOf ::= <<p1>> (<<p2>> <<p1>>)* {pin=1}
 
 
 private symbol ::= IDENT | T_ADDR | T_TYPE | ACCENT_QUOTED | '_'
@@ -67,21 +67,24 @@ IdentPragmaPair ::= IdentifierDef OPERATOR? Pragma?
 
 fake IdentifierDefs ::=
 
-private colonTypeDesc ::= T_COLON &OPTIND TypeDesc
+private colonTypeDesc ::= T_COLON &OPTIND TypeDesc {pin=1}
 
 private identColonEquals ::=
-    <<listOf (&(IDENT | ACCENT_QUOTED) IdentifierDef) (T_COMMA &OPTIND)>> (T_COMMA &OPTIND)?
+    <<listOf (indentedIdentifierDef) (commaInd)>> (commaInd)?
     (colonTypeDesc (T_EQ &OPTIND expr)? | T_EQ &OPTIND expr)
 
-private identColonEqualsWithPragma ::=
-    <<listOf (&(IDENT | ACCENT_QUOTED) IdentPragmaPair) (T_COMMA &OPTIND)>> (T_COMMA &OPTIND)?
+identColonEqualsWithPragma ::=
+    <<listOf (indentedIdentPragmaPair) (commaInd)>> (commaInd)?
     (colonTypeDesc (T_EQ &OPTIND expr)? | T_EQ &OPTIND expr)
 
 identColonEqualsWithBothOptionalWithPragma ::=
-    <<listOf (&(IDENT | ACCENT_QUOTED) IdentPragmaPair) (T_COMMA &OPTIND)>> (T_COMMA &OPTIND)?
+    <<listOf (indentedIdentPragmaPair) (commaInd)>> (commaInd)?
     (colonTypeDesc)? (T_EQ &OPTIND expr)?
     {elementType=IdentifierDefs}
 
+private commaInd ::= T_COMMA &OPTIND {pin=1}
+private indentedIdentifierDef ::= &(IDENT | ACCENT_QUOTED) IdentifierDef {pin=1}
+private indentedIdentPragmaPair ::= &(IDENT | ACCENT_QUOTED) IdentPragmaPair {pin=1}
 
 private Block ::= <<indented <<listOf complexOrSimpleStmt (T_SEMICOLON (&INDNONE | &INDEQ) | &INDEQ)>>>>
     | !<<inSemiStmtList>> <<listOf (&INDNONE simpleStmt) (T_SEMICOLON)>>
@@ -118,7 +121,9 @@ private complexOrSimpleStmt ::=
 private complexOrSimpleStmtRecover ::= !(INDEQ | INDLT | T_SEMICOLON | T_RPAREN | T_COMMA)
 
 
-private condStmt ::= <<listOf (expr T_COLON stmt) ((&INDNONE | &INDEQ) T_ELIF)>> ((&INDNONE | &INDEQ) T_ELSE T_COLON stmt)?
+private condStmt ::= <<listOf (expr T_COLON stmt) ((&INDNONE | &INDEQ) T_ELIF)>> (elseStmtBranch)?
+
+elseStmtBranch ::= (&INDNONE | &INDEQ) T_ELSE T_COLON stmt
 
 IfStmt ::= T_IF &OPTIND condStmt {pin=1 extends=Statement}
 
@@ -132,7 +137,7 @@ private caseBranches ::= (caseBranch)* (elifBranch)* (elseBranch)?
 elseBranch ::= &INDEQ T_ELSE T_COLON stmt
 elifBranch ::= &INDEQ T_ELIF &OPTIND expr T_COLON stmt
 caseBranch ::= &INDEQ T_OF &OPTIND exprList T_COLON stmt
-exprList ::= <<listOf expr (T_COMMA &OPTIND)>>
+exprList ::= <<listOf expr (commaInd)>>
 
 TryStmt ::= T_TRY T_COLON stmt (&(INDNONE | INDEQ) T_EXCEPT &OPTIND exprList? T_COLON stmt)*
             (&(INDNONE | INDEQ) T_FINALLY T_COLON stmt)? {pin=1 extends=Statement}
@@ -147,12 +152,13 @@ StaticStmt ::= T_STATIC T_COLON stmt {pin=1 extends=Statement}
 
 AsmStmt ::= T_ASM &INDNONE Pragma? &stringLiteral Literal {pin=1 extends=Statement}
 
-private routine ::= &OPTIND Identifier OPERATOR? (&OPTIND Pattern)? (&OPTIND genericParameters)? &INDNONE paramListColon (&OPTIND Pragma)? (&OPTIND T_EQ stmt)?
+routineIdentifier ::= Identifier
+private routine ::= &OPTIND routineIdentifier OPERATOR? (&OPTIND Pattern)? (&OPTIND genericParameters)? &INDNONE paramListColon (&OPTIND Pragma)? (&OPTIND T_EQ stmt)?
 
 Pattern ::= T_LBRACE stmt T_RBRACE {pin=1}
 
 private genericParameters ::= T_LBRACKET &OPTIND <<listOf GenericParam (T_COMMA | T_SEMICOLON)>>? T_RBRACKET {pin=1}
-GenericParam ::= <<listOf ((&IDENT | &ACCENT_QUOTED) IdentifierDef) (T_COMMA &OPTIND)>> (T_COLON &OPTIND expr)? (T_EQ &OPTIND expr)?
+GenericParam ::= <<listOf ((&IDENT | &ACCENT_QUOTED) IdentifierDef) (commaInd)>> (T_COLON &OPTIND expr)? (T_EQ &OPTIND expr)?
 
 //private params ::= &INDNONE T_LPAREN &OPTIND <<listOf identColonEqualsWithBothOptionalWithPragma (T_COMMA | T_SEMICOLON)>>? T_RPAREN {pin=2}
 private params ::= &INDNONE T_LPAREN &OPTIND routineParamList? T_RPAREN {pin=2}
@@ -200,7 +206,7 @@ private simpleStmt ::=
   | ImportStmt
   | FromStmt
   | IncludeStmt
-  | (&isExprStart ExprStmt)?
+  | (&isExprStart ExprStmt)
 
 ReturnStmt ::= T_RETURN (&OPTIND &isExprStart expr)? {pin=1 extends=Statement}
 
@@ -216,14 +222,14 @@ ContinueStmt ::= T_CONTINUE (&OPTIND &isExprStart expr)? {pin=1 extends=Statemen
 
 PragmaStmt ::= Pragma (&INDNONE T_COLON stmt)? {extends=Statement}
 
-ImportStmt ::= T_IMPORT &OPTIND moduleName (T_EXCEPT <<listOf (&OPTIND moduleName) (T_COMMA)>> | (T_COMMA &OPTIND moduleName)*) {pin=1 extends=Statement}
+ImportStmt ::= T_IMPORT &OPTIND moduleName (T_EXCEPT <<listOf (&OPTIND moduleName) (T_COMMA)>> | (commaInd moduleName)*) {pin=1 extends=Statement}
 private moduleName ::= expr
 
 FromStmt ::= T_FROM &OPTIND moduleName T_IMPORT <<listOf (&OPTIND expr) (T_COMMA)>> {pin=1}
 
 IncludeStmt ::= T_INCLUDE <<listOf (&OPTIND expr) (T_COMMA)>> {pin=1}
 
-ExprStmt ::= simpleExpr (AssignmentExpr | &INDNONE <<extendCommand (T_COMMA &OPTIND expr)+>>? (&T_DO doBlocks | macroColon)? )?
+ExprStmt ::= simpleExpr (AssignmentExpr | &INDNONE <<extendCommand (commaInd expr)+>>? (&T_DO doBlocks | macroColon)? )?
   {extends=Statement}
 
 fake Expression ::= expr

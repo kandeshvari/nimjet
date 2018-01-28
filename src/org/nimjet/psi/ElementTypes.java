@@ -213,6 +213,9 @@ public interface ElementTypes {
 	IElementType ELIF_BRANCH = new NimElementType("EL_IF_BRANCH");
 	IElementType BRACE_EXPR = new NimElementType("BRACE_EXPR");
 	IElementType EXPR_COLON_EQ_EXPR_LIST = new NimElementType("EXPR_COLON_EQ_EXPR_LIST");
+	IElementType ELSE_STMT_BRANCH = new NimElementType("ELSE_STMT_BRANCH");
+	IElementType IDENT_COLON_EQUALS_WITH_PRAGMA = new NimElementType("IDENT_COLON_EQUALS_WITH_PRAGMA");
+	IElementType ROUTINE_IDENTIFIER = new NimElementType("ROUTINE_IDENTIFIER");
 
 
 	class Factory {
@@ -404,6 +407,12 @@ public interface ElementTypes {
 				return new BraceExprImpl(node);
 			} else if (type == EXPR_COLON_EQ_EXPR_LIST) {
 				return new ExprColonEqExprListImpl(node);
+			} else if (type == ELSE_STMT_BRANCH) {
+				return new ElseStmtBranchImpl(node);
+			} else if (type == IDENT_COLON_EQUALS_WITH_PRAGMA) {
+				return new IdentColonEqualsWithPragmaImpl(node);
+			} else if (type == ROUTINE_IDENTIFIER) {
+				return new RoutineIdentifierImpl(node);
 			}
 
 			throw new AssertionError("Unknown element type: " + type);
@@ -451,7 +460,7 @@ public interface ElementTypes {
 		PROC_DEF, TEMPLATE_DEF, TUPLE_DEF, TYPE_DEF, VAR_DEF);
 
 	TokenSet OTHER_BLOCKS = TokenSet.create(TYPE_DESC, CASE_BRANCH, DO_BLOCK, OBJECT_FIELDS, BRACKET_CTOR, ENUM_MEMBER, CTOR_ARG,
-		EXPR_COLON_EQ_EXPR_LIST);
+		EXPR_COLON_EQ_EXPR_LIST, ELSE_STMT_BRANCH, ROUTINE_IDENTIFIER);
 
 	TokenSet BLOCK_START_TOKENS = TokenSet.orSet(EXPRESSIONS, STATEMENTS, SECTIONS, DEFINITIONS, OTHER_BLOCKS);
 
@@ -459,7 +468,7 @@ public interface ElementTypes {
 	TokenSet CHILD_TOKENS = TokenSet.create(LITERAL, T_EQ, SET_OR_TABLE_CTOR);
 
 	// avoid extra indentation for these elements
-	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH, DO_BLOCK);
+	TokenSet AVOID_INDENT = TokenSet.create(CASE_BRANCH, ELIF_BRANCH, ELSE_BRANCH, DO_BLOCK, ELSE_STMT_BRANCH);
 
 	// extra set for space indents
 	TokenSet ARGS_ALIGNED_BY_FIND = TokenSet.create(OBJECT_CTOR, IDENTIFIER_DEFS);
