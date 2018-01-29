@@ -27,6 +27,12 @@ class NimSyntaxHighlighter : SyntaxHighlighterBase() {
 		val FUNCTION_DECLARATION = TextAttributesKey.createTextAttributesKey("NIM_FUNCTION_DECLARATION", Default.FUNCTION_DECLARATION)
 		val FUNCTION_CALL = TextAttributesKey.createTextAttributesKey("NIM_FUNCTION_CALL", Default.FUNCTION_CALL)
 		val IDENTIFIER = TextAttributesKey.createTextAttributesKey("NIM_IDENTIFIER", Default.IDENTIFIER)
+		val TYPE_DEFINITION = TextAttributesKey.createTextAttributesKey("NIM_TYPE_DEFINITION", Default.IDENTIFIER)
+		val TYPE = TextAttributesKey.createTextAttributesKey("NIM_TYPE", Default.IDENTIFIER)
+		val PUBLIC_OPERATOR = TextAttributesKey.createTextAttributesKey("NIM_PUBLIC_OPERATOR", Default.OPERATION_SIGN)
+		val FUNCTION_PARAMETER = TextAttributesKey.createTextAttributesKey("NIM_FUNCTION_PARAMETER", Default.IDENTIFIER)
+		val BUILTIN_TYPE = TextAttributesKey.createTextAttributesKey("NIM_BUILTIN_TYPE", Default.IDENTIFIER)
+		val RESULT_PARAM = TextAttributesKey.createTextAttributesKey("NIM_RESULT_PARAM", Default.IDENTIFIER)
 
 	}
 
