@@ -60,7 +60,7 @@ object NimBlockUtils {
 		return null
 	}
 
-	private fun getLastChild(parent: ASTNode, notError: Boolean = true): ASTNode {
+	fun getLastChild(parent: ASTNode, notError: Boolean = true): ASTNode {
 		//println("D: getLastChild: parent ${parent.elementType}")
 		var p = parent.lastChildNode
 		while (p != null) {
@@ -80,7 +80,7 @@ object NimBlockUtils {
 		return parent
 	}
 
-	private fun ancestorOf(ancestorIElementTypes: TokenSet, node: ASTNode?): Boolean {
+	fun ancestorOf(ancestorIElementTypes: TokenSet, node: ASTNode?): Boolean {
 		if (node != null) {
 			var p = node.treeParent
 			while (p != null) {
@@ -91,7 +91,7 @@ object NimBlockUtils {
 		return false
 	}
 
-	private fun ancestorOf(ancestorIElementType: IElementType, node: ASTNode?): Boolean {
+	fun ancestorOf(ancestorIElementType: IElementType, node: ASTNode?): Boolean {
 		if (node != null) {
 			var p = node.treeParent
 			while (p != null) {
@@ -102,7 +102,7 @@ object NimBlockUtils {
 		return false
 	}
 
-	private fun getAncestorOf(ancestorIElementType: IElementType, node: ASTNode): ASTNode? {
+	fun getAncestorOf(ancestorIElementType: IElementType, node: ASTNode): ASTNode? {
 		var p = node.treeParent
 		while (p != null) {
 			if (p.elementType == ancestorIElementType) return p
@@ -111,7 +111,7 @@ object NimBlockUtils {
 		return null
 	}
 
-	private fun debugIdx(parent: ASTNode, idx: Int) {
+	fun debugIdx(parent: ASTNode, idx: Int) {
 		var p = parent.firstChildNode
 		//println("D: parent: ${parent.elementType}")
 		var count = 0
@@ -125,7 +125,7 @@ object NimBlockUtils {
 		}
 	}
 
-	private fun getNodeIndent(node: ASTNode): Int {
+	fun getNodeIndent(node: ASTNode): Int {
 		val prev = node.treePrev
 		if (prev != null && prev.elementType == TokenType.WHITE_SPACE) {
 			val indentWhitespaces = prev.text.substringAfterLast('\n', "x")
@@ -138,7 +138,7 @@ object NimBlockUtils {
 		return -1
 	}
 
-	private fun findIndentedAncestor(node: ASTNode, level: Int = 1): Pair<ASTNode, Int> {
+	fun findIndentedAncestor(node: ASTNode, level: Int = 1): Pair<ASTNode, Int> {
 		var p = node.treeParent
 		var prevSave = node
 		var counter = level
@@ -162,14 +162,14 @@ object NimBlockUtils {
 		return Pair(prevSave, 0)
 	}
 
-	private fun findIndentedNeighbourOrAncestor(node: ASTNode, level: Int = 1): Pair<ASTNode, Int> {
+	fun findIndentedNeighbourOrAncestor(node: ASTNode, level: Int = 1): Pair<ASTNode, Int> {
 		val prev = findIndentedNeighbour(node, level)
 		if (prev != null) return prev
 		//println("D: findIndentedNeighbourOrAncestor: indented prev not found, try to find indented ancestor")
 		return findIndentedAncestor(node, level)
 	}
 
-	private fun findIndentedNeighbour(node: ASTNode, level: Int = 1): Pair<ASTNode, Int>? {
+	fun findIndentedNeighbour(node: ASTNode, level: Int = 1): Pair<ASTNode, Int>? {
 		//println("D: findIndentedNeighbour: we are [${node.elementType}]")
 		var counter = level
 		var p = node.treePrev
@@ -196,11 +196,11 @@ object NimBlockUtils {
 		return null
 	}
 
-	private fun isAncestor(ancestor: ASTNode, node: ASTNode, strict: Boolean = true): Boolean {
+	fun isAncestor(ancestor: ASTNode, node: ASTNode, strict: Boolean = true): Boolean {
 		return PsiTreeUtil.isAncestor(ancestor.treeParent?.psi, node.psi, strict)
 	}
 
-	private fun getDiffIndent(successorNode: ASTNode, wsNode: ASTNode, extraIndent: Int = 0, level: Int = 1): Indent {
+	fun getDiffIndent(successorNode: ASTNode, wsNode: ASTNode, extraIndent: Int = 0, level: Int = 1): Indent {
 		val indentedAncestor = findIndentedNeighbourOrAncestor(successorNode, level)
 		val wsIndentedAncestor = findIndentedAncestor(wsNode)
 		val indent = indentedAncestor.second - wsIndentedAncestor.second + extraIndent
@@ -208,7 +208,7 @@ object NimBlockUtils {
 		return Indent.getSpaceIndent(indent, false)
 	}
 
-	private fun getPrevNotWhitespace(node: ASTNode): ASTNode? {
+	fun getPrevNotWhitespace(node: ASTNode): ASTNode? {
 		var p = node.treePrev
 		while (p != null && p.elementType == TokenType.WHITE_SPACE) p = p.treePrev
 		return p
