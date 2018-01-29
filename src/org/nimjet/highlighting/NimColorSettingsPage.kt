@@ -28,7 +28,13 @@ class NimColorSettingsPage : ColorSettingsPage {
 		AttributesDescriptor("Parentheses", NimSyntaxHighlighter.PARENTHESES),
 		AttributesDescriptor("Pragma", NimSyntaxHighlighter.PRAGMA),
 		AttributesDescriptor("Function declaration", NimSyntaxHighlighter.FUNCTION_DECLARATION),
-		AttributesDescriptor("Function call", NimSyntaxHighlighter.FUNCTION_CALL)
+		AttributesDescriptor("Function call", NimSyntaxHighlighter.FUNCTION_CALL),
+		AttributesDescriptor("Type definition", NimSyntaxHighlighter.TYPE_DEFINITION),
+		AttributesDescriptor("Type use", NimSyntaxHighlighter.TYPE),
+		AttributesDescriptor("Public operator", NimSyntaxHighlighter.PUBLIC_OPERATOR),
+		AttributesDescriptor("Function parameter", NimSyntaxHighlighter.FUNCTION_PARAMETER),
+		AttributesDescriptor("Built-in type", NimSyntaxHighlighter.BUILTIN_TYPE),
+		AttributesDescriptor("Output parameter 'result'", NimSyntaxHighlighter.RESULT_PARAM)
 	)
 
 	override fun getHighlighter(): SyntaxHighlighter = NimSyntaxHighlighter()
