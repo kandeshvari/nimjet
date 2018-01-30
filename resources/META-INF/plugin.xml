@@ -49,6 +49,9 @@
         <!-- annontators -->
         <annotator language="Nim" implementationClass="org.nimjet.annotator.NimAnnotator"/>
 
+        <!-- references -->
+        <psi.referenceContributor implementation="org.nimjet.psi.ref.NimReferenceContributor"/>
+
     </extensions>
 
     <actions>

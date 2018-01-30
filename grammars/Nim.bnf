@@ -16,6 +16,7 @@
   tokenTypeClass = "org.nimjet.psi.NimTokenType"
 
   parserUtilClass = "org.nimjet.parser.NimParserUtil"
+  psiImplUtilClass="org.nimjet.psi.impl.NimPsiImplUtil"
 
 //  generate=[psi="no" elements="no" tokens="no"]
 
@@ -59,7 +60,10 @@ Identifier ::= symbol
 // On the other hand, in "proc foo() = discard" the symbol "foo" doesn't need to be an IdentifierDef, because we can
 // refer to the procedure as a whole (i.e. we can refer to the ProcDef).
 // The underlying difference is that IdentifierDef implements PsiNamedElement.
-IdentifierDef ::= symbol {extends=Identifier}
+IdentifierDef ::= symbol {extends=Identifier
+    mixin="org.nimjet.psi.impl.NimNamedElementImpl"
+    implements="org.nimjet.psi.NimNamedElement"
+    methods=[getName setName getNameIdentifier]}
 
 private identWithPragma ::= Identifier OPERATOR? Pragma?
 
