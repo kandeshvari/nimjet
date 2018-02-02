@@ -55,3 +55,5 @@ fabric.properties
 /.idea/
 !/.idea/nimjet.iml
 *.skeleton
+
+gen/

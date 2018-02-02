@@ -17,12 +17,13 @@ object NimReferenceContributor : PsiReferenceContributor() {
 			object : PsiReferenceProvider() {
 				override fun getReferencesByElement(element: PsiElement,
 				                                    context: ProcessingContext): Array<PsiReference> {
+					println("NimReferenceContributor")
 					val literalExpression = element as PsiLiteralExpression
 					val value = if (literalExpression.value is String)
 						literalExpression.value as String?
 					else
 						null
-					return if (value != null && value.startsWith("simple" + ":")) {
+					return if (value != null && value.startsWith("nim" + ":")) {
 						arrayOf<PsiReference>(NimReference(element, TextRange(8, value.length + 1)))
 					} else PsiReference.EMPTY_ARRAY
 				}

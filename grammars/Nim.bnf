@@ -53,17 +53,19 @@ Literal ::= FLOAT64_LITERAL
           | stringLiteral
           {extends=Expression}
 
-Identifier ::= symbol
+Identifier ::= symbol {
+    mixin="org.nimjet.psi.impl.NimNamedElementImpl"
+    implements="org.nimjet.psi.NimNamedElement"
+    methods=[getReference]
+//    methods=[getName setName getNameIdentifier getReference]
+}
 
 // Used when the identifier is the sole element that represents a definition.
 // Mostly used in cases like "a, b, c: SomeType" where the only way to uniquely refer to "a" is through the identifier.
 // On the other hand, in "proc foo() = discard" the symbol "foo" doesn't need to be an IdentifierDef, because we can
 // refer to the procedure as a whole (i.e. we can refer to the ProcDef).
 // The underlying difference is that IdentifierDef implements PsiNamedElement.
-IdentifierDef ::= symbol {extends=Identifier
-    mixin="org.nimjet.psi.impl.NimNamedElementImpl"
-    implements="org.nimjet.psi.NimNamedElement"
-    methods=[getName setName getNameIdentifier]}
+IdentifierDef ::= symbol {extends=Identifier}
 
 private identWithPragma ::= Identifier OPERATOR? Pragma?
 
