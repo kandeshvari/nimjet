@@ -40,4 +40,12 @@ class ScopeWalker<T: PsiElement>(val klass: Class<T>) {
 			}
 			return findInScope(getUpperScope(e), name)
 		}
+
+		fun findInScope(e: PsiElement): ArrayList<T> {
+//			println("SCOPE: $e")
+			val res = ArrayList(e.children.filterIsInstance(klass))
+//			println("FOUND: ${res}")
+			if (e is NimFile) return res
+			return findInScope(getUpperScope(e))
+		}
 }

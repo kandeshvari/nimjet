@@ -9,22 +9,18 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElement
 
 
-
-
 class RoutineReference(element: Identifier) : PsiReferenceBase<Identifier>(element, TextRange.from(0, element.textLength)) {
 	override fun getVariants(): Array<Any?> {
 		println("getVariants RoutineReference")
-//		return arrayOf(
-//			LookupElementBuilder.create("xxx1")
-//			.setIcon(PlatformIcons.VARIABLE_ICON)
-//			.setTypeText("Map<String,Object>"),
-//			LookupElementBuilder.create("xxx2")
-//			.setIcon(PlatformIcons.VARIABLE_ICON)
-//			.setTypeText("Root Object"),
-//			LookupElementBuilder.create("xxx3")
-//			.setIcon(PlatformIcons.VARIABLE_ICON)
-//			.setTypeText("<Current Object>"))
-		return emptyArray()
+		val routines =
+			ScopeWalker<ProcDef>(ProcDef::class.java).findInScope(element.parent)
+
+		return routines.map {
+			val name = it.name ?: "null"
+			LookupElementBuilder.create(name)
+				.withIcon(PlatformIcons.FUNCTION_ICON)
+				.withTypeText("Proc")
+		}.toTypedArray()
 	}
 
 	override fun resolve(): NimNamedElement? {
