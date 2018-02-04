@@ -7,6 +7,10 @@ import org.nimjet.psi.NimNamedElement
 import com.intellij.util.PlatformIcons
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.psi.PsiElement
+import com.intellij.util.IncorrectOperationException
+import org.nimjet.psi.ElementFactory
+import org.nimjet.psi.ElementTypes
 
 
 class RoutineReference(element: Identifier) : PsiReferenceBase<Identifier>(element, TextRange.from(0, element.textLength)) {
@@ -29,4 +33,12 @@ class RoutineReference(element: Identifier) : PsiReferenceBase<Identifier>(eleme
 			ScopeWalker<ProcDef>(ProcDef::class.java).findInScope(element.parent, name)
 		return routine?.nameIdentifier
 	}
+
+	override fun handleElementRename(newElementName: String): PsiElement {
+		val newNode = ElementFactory.createIdentNode(element.project, newElementName)
+		val elemNode = element.node
+		elemNode.replaceChild(elemNode.findChildByType(ElementTypes.IDENT)!!, newNode)
+		return element
+	}
+
 }

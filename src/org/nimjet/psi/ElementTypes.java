@@ -1,19 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.nimjet.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import generated.psi.impl.*;
 
 public interface ElementTypes {
-
 	IElementType ACCENT_QUOTED = new NimTokenType("ACCENT_QUOTED");
 	IElementType ASM_STMT = new NimElementType("ASM_STMT");
 	IElementType ASSIGNMENT_EXPR = new NimElementType("ASSIGNMENT_EXPR");
 	IElementType BIND_STMT = new NimElementType("BIND_STMT");
-	//	IElementType BLOCK = new NimElementType("BLOCK");
 	IElementType BLOCK_STMT = new NimElementType("BLOCK_STMT");
 	IElementType BRACKET_CTOR = new NimElementType("BRACKET_CTOR");
 	IElementType BRACKET_EXPR = new NimElementType("BRACKET_EXPR");
@@ -193,7 +188,6 @@ public interface ElementTypes {
 	IElementType T_ATOMIC = new NimTokenType("T_ATOMIC");
 	IElementType T_CONCEPT = new NimTokenType("T_CONCEPT");
 	IElementType T_CONVERTER = new NimTokenType("T_CONVERTER");
-	//	IElementType T_DOLLAR = new NimTokenType("T_DOLLAR");
 	IElementType T_DBLCOLON = new NimTokenType("T_DBLCOLON");
 	IElementType T_END = new NimTokenType("T_END");
 	IElementType T_EXPORT = new NimTokenType("T_EXPORT");
@@ -218,207 +212,6 @@ public interface ElementTypes {
 	IElementType ROUTINE_IDENTIFIER = new NimElementType("ROUTINE_IDENTIFIER");
 
 
-	class Factory {
-		public static PsiElement createElement(ASTNode node) {
-			IElementType type = node.getElementType();
-			if (type == ASM_STMT) {
-				return new AsmStmtImpl(node);
-			} else if (type == ASSIGNMENT_EXPR) {
-				return new AssignmentExprImpl(node);
-			} else if (type == BIND_STMT) {
-				return new BindStmtImpl(node);
-//			} else if (type == BLOCK) {
-//				return new BlockImpl(node);
-			} else if (type == BLOCK_STMT) {
-				return new BlockStmtImpl(node);
-			} else if (type == BRACKET_CTOR) {
-				return new BracketCtorImpl(node);
-			} else if (type == BRACKET_EXPR) {
-				return new BracketExprImpl(node);
-			} else if (type == BREAK_STMT) {
-				return new BreakStmtImpl(node);
-			} else if (type == CALL_EXPR) {
-				return new CallExprImpl(node);
-			} else if (type == CASE_EXPR) {
-				return new CaseExprImpl(node);
-			} else if (type == CASE_STMT) {
-				return new CaseStmtImpl(node);
-			} else if (type == CAST_EXPR) {
-				return new CastExprImpl(node);
-			} else if (type == COMMAND_EXPR) {
-				return new CommandExprImpl(node);
-			} else if (type == CONST_DEF) {
-				return new ConstDefImpl(node);
-			} else if (type == CONST_SECT) {
-				return new ConstSectImpl(node);
-			} else if (type == CONTINUE_STMT) {
-				return new ContinueStmtImpl(node);
-			} else if (type == CTOR_ARG) {
-				return new CtorArgImpl(node);
-			} else if (type == DISCARD_STMT) {
-				return new DiscardStmtImpl(node);
-			} else if (type == DISTINCT_TYPE_CLASS) {
-				return new DistinctTypeClassImpl(node);
-			} else if (type == DISTINCT_TYPE_EXPR) {
-				return new DistinctTypeExprImpl(node);
-			} else if (type == DOT_EXPR) {
-				return new DotExprImpl(node);
-			} else if (type == DO_BLOCK) {
-				return new DoBlockImpl(node);
-			} else if (type == ENUM_DEF) {
-				return new EnumDefImpl(node);
-			} else if (type == ENUM_MEMBER) {
-				return new EnumMemberImpl(node);
-			} else if (type == ENUM_TYPE_CLASS) {
-				return new EnumTypeClassImpl(node);
-			} else if (type == EXPR_STMT) {
-				return new ExprStmtImpl(node);
-			} else if (type == FOR_STMT) {
-				return new ForStmtImpl(node);
-			} else if (type == FROM_STMT) {
-				return new FromStmtImpl(node);
-			} else if (type == GENERIC_PARAM) {
-				return new GenericParamImpl(node);
-			} else if (type == GROUPED_EXPR) {
-				return new GroupedExprImpl(node);
-			} else if (type == IDENTIFIER) {
-				return new IdentifierImpl(node);
-			} else if (type == IDENTIFIER_DEF) {
-				return new IdentifierDefImpl(node);
-			} else if (type == IDENTIFIER_DEFS) {
-				return new IdentifierDefsImpl(node);
-			} else if (type == IDENTIFIER_EXPR) {
-				return new IdentifierExprImpl(node);
-			} else if (type == IDENT_PRAGMA_PAIR) {
-				return new IdentPragmaPairImpl(node);
-			} else if (type == IF_EXPR) {
-				return new IfExprImpl(node);
-			} else if (type == IF_STMT) {
-				return new IfStmtImpl(node);
-			} else if (type == INFIX_EXPR) {
-				return new InfixExprImpl(node);
-			} else if (type == IMPORT_STMT) {
-				return new ImportStmtImpl(node);
-			} else if (type == INCLUDE_STMT) {
-				return new IncludeStmtImpl(node);
-			} else if (type == ITERATOR_DEF) {
-				return new IteratorDefImpl(node);
-			} else if (type == LET_SECT) {
-				return new LetSectImpl(node);
-			} else if (type == LITERAL) {
-				return new LiteralImpl(node);
-			} else if (type == MACRO_DEF) {
-				return new MacroDefImpl(node);
-			} else if (type == MIXIN_STMT) {
-				return new MixinStmtImpl(node);
-			} else if (type == NIL_TOKEN) {
-				return new NilTokenImpl(node);
-			} else if (type == OBJECT_CTOR) {
-				return new ObjectCtorImpl(node);
-			} else if (type == OBJECT_DEF) {
-				return new ObjectDefImpl(node);
-			} else if (type == OBJECT_FIELDS) {
-				return new ObjectFieldsImpl(node);
-			} else if (type == OBJECT_TYPE_CLASS) {
-				return new ObjectTypeClassImpl(node);
-			} else if (type == PATTERN) {
-				return new PatternImpl(node);
-			} else if (type == PRAGMA) {
-				return new PragmaImpl(node);
-			} else if (type == PRAGMA_STMT) {
-				return new PragmaStmtImpl(node);
-			} else if (type == PREFIX_EXPR) {
-				return new PrefixExprImpl(node);
-			} else if (type == PROC_DEF) {
-				return new ProcDefImpl(node);
-			} else if (type == PROC_EXPR) {
-				return new ProcExprImpl(node);
-			} else if (type == PROC_TYPE_CLASS) {
-				return new ProcTypeClassImpl(node);
-			} else if (type == PROC_TYPE_EXPR) {
-				return new ProcTypeExprImpl(node);
-			} else if (type == PTR_TYPE_CLASS) {
-				return new PtrTypeClassImpl(node);
-			} else if (type == PTR_TYPE_EXPR) {
-				return new PtrTypeExprImpl(node);
-			} else if (type == RAISE_STMT) {
-				return new RaiseStmtImpl(node);
-			} else if (type == REF_TYPE_CLASS) {
-				return new RefTypeClassImpl(node);
-			} else if (type == REF_TYPE_EXPR) {
-				return new RefTypeExprImpl(node);
-			} else if (type == RETURN_STMT) {
-				return new ReturnStmtImpl(node);
-			} else if (type == SET_OR_TABLE_CTOR) {
-				return new SetOrTableCtorImpl(node);
-			} else if (type == STATIC_STMT) {
-				return new StaticStmtImpl(node);
-			} else if (type == STATIC_TYPE_EXPR) {
-				return new StaticTypeExprImpl(node);
-			} else if (type == STMT_LIST_EXPR) {
-				return new StmtListExprImpl(node);
-			} else if (type == TEMPLATE_DEF) {
-				return new TemplateDefImpl(node);
-			} else if (type == TRY_STMT) {
-				return new TryStmtImpl(node);
-			} else if (type == TUPLE_CTOR) {
-				return new TupleCtorImpl(node);
-			} else if (type == TUPLE_DEF) {
-				return new TupleDefImpl(node);
-			} else if (type == TUPLE_TYPE_CLASS) {
-				return new TupleTypeClassImpl(node);
-			} else if (type == TUPLE_TYPE_EXPR) {
-				return new TupleTypeExprImpl(node);
-			} else if (type == TYPE_DEF) {
-				return new TypeDefImpl(node);
-			} else if (type == TYPE_DESC) {
-				return new TypeDescImpl(node);
-			} else if (type == TYPE_SECT) {
-				return new TypeSectImpl(node);
-			} else if (type == VAR_DEF) {
-				return new VarDefImpl(node);
-			} else if (type == VAR_SECT) {
-				return new VarSectImpl(node);
-			} else if (type == VAR_TYPE_CLASS) {
-				return new VarTypeClassImpl(node);
-			} else if (type == VAR_TYPE_EXPR) {
-				return new VarTypeExprImpl(node);
-			} else if (type == WHEN_EXPR) {
-				return new WhenExprImpl(node);
-			} else if (type == WHEN_STMT) {
-				return new WhenStmtImpl(node);
-			} else if (type == WHILE_STMT) {
-				return new WhileStmtImpl(node);
-			} else if (type == YIELD_STMT) {
-				return new YieldStmtImpl(node);
-			} else if (type == METHOD_DEF) {
-				return new MethodDefImpl(node);
-			} else if (type == EXPR_LIST) {
-				return new ExprListImpl(node);
-			} else if (type == ROUTINE_PARAM_LIST) {
-				return new RoutineParamListImpl(node);
-			} else if (type == CASE_BRANCH) {
-				return new CaseBranchImpl(node);
-			} else if (type == ELSE_BRANCH) {
-				return new ElseBranchImpl(node);
-			} else if (type == ELIF_BRANCH) {
-				return new ElifBranchImpl(node);
-			} else if (type == BRACE_EXPR) {
-				return new BraceExprImpl(node);
-			} else if (type == EXPR_COLON_EQ_EXPR_LIST) {
-				return new ExprColonEqExprListImpl(node);
-			} else if (type == ELSE_STMT_BRANCH) {
-				return new ElseStmtBranchImpl(node);
-			} else if (type == IDENT_COLON_EQUALS_WITH_PRAGMA) {
-				return new IdentColonEqualsWithPragmaImpl(node);
-			} else if (type == ROUTINE_IDENTIFIER) {
-				return new RoutineIdentifierImpl(node);
-			}
-
-			throw new AssertionError("Unknown element type: " + type);
-		}
-	}
-
 	TokenSet DOC_COMMENTS = TokenSet.create(DOC_BLOCK_COMMENT, DOC_COMMENT);
 	TokenSet STRINGS = TokenSet.create(STRING_LITERAL, CHARACTER_LITERAL, TRIPLESTR_LITERAL);
 	TokenSet KEYWORDS = TokenSet.create(T_ADDR, T_AND, T_AS, T_ASM, T_ATOMIC, T_BIND, T_BLOCK, T_BREAK, T_CASE, T_CAST,
@@ -439,6 +232,8 @@ public interface ElementTypes {
 	TokenSet BRACES = TokenSet.create(T_LBRACE, T_RBRACE);
 	TokenSet BLOCK_SECT = TokenSet.create(PROC_DEF, PROC_TYPE_CLASS);
 	TokenSet PROCS_EXPR = TokenSet.create(PROC_EXPR, PROC_TYPE_EXPR);
+
+	TokenSet LITERALS = TokenSet.orSet(NUMBER_LITERALS, STRINGS);
 
 	/* for aligner */
 	// these expressions should be aligned by first keyword(expression start)

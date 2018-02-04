@@ -12,7 +12,7 @@ object ProcDefImplUtil {
 
 	@JvmStatic
 	fun setName(e: ProcDef, newName: String): NimNamedElement {
-			println("SET NAME: $newName")
+//			println("SET NAME: $newName")
 //			val keyNode = e.node.findChildByType(ElementTypes.IDENT)
 //			if (keyNode != null) {
 //

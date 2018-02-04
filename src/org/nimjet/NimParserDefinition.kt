@@ -14,6 +14,7 @@ import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import org.nimjet.parser.NimLexer
 import org.nimjet.parser.NimParser
+import org.nimjet.psi.ElementFactory
 import org.nimjet.psi.ElementTypes
 
 class NimParserDefinition : ParserDefinition {
@@ -43,9 +44,8 @@ class NimParserDefinition : ParserDefinition {
 
         override fun createLexer(p0: Project?): Lexer = FlexAdapter(NimLexer())
 
-        override fun createElement(p0: ASTNode?): PsiElement {
-//                return ElementFactory.createElement(p0);
-                return ElementTypes.Factory.createElement(p0);
+        override fun createElement(p0: ASTNode): PsiElement {
+                return ElementFactory.createElement(p0);
         }
 
         override fun getCommentTokens(): TokenSet = COMMENTS

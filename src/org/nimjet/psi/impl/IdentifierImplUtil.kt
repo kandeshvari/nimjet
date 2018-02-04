@@ -17,7 +17,7 @@ object IdentifierImplUtil {
 
 	@JvmStatic
 	fun setName(e: Identifier, newName: String): NimNamedElement {
-		println("Identifier SET NAME: $newName")
+//		println("Identifier SET NAME: $newName")
 //			val keyNode = e.node.findChildByType(ElementTypes.IDENT)
 //			if (keyNode != null) {
 //

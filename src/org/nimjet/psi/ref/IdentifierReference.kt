@@ -34,31 +34,9 @@ class IdentifierReference(element: Identifier) : PsiReferenceBase<Identifier>(el
 	}
 
 	override fun resolve(): PsiElement? {
-//		println("resolve")
 		return element
 	}
 
-//	@Throws(IncorrectOperationException::class)
-//	override fun handleElementRename(newElementName: String): PsiElement {
-//		println("handleElementRename")
-//		return element
-//	}
-
 	companion object {
-
-//		fun getRoutineInsertHandler(ignoreFirstArg: Boolean): InsertHandler<LookupElement> {
-//			return { context, item ->
-//				val editor = context.getEditor()
-//				val document = editor.getDocument()
-//				var offset = context.getTailOffset()
-//				document.insertString(offset, "()")
-//				val def = (item.getPsiElement() as RoutineDef)!!
-//				if (ignoreFirstArg)
-//					offset += if (def!!.getMaxParameterCount() === 1) 2 else 1
-//				else
-//					offset += if (def!!.hasParams()) 1 else 2
-//				editor.getCaretModel().moveToOffset(offset)
-//			}
-//		}
 	}
 }

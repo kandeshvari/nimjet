@@ -51,6 +51,9 @@
 
         <!-- references -->
         <psi.referenceContributor implementation="org.nimjet.psi.ref.NimReferenceContributor"/>
+        <lang.refactoringSupport language="Nim" implementationClass="org.nimjet.psi.NimRefactoringSupportProvider"/>
+        <lang.findUsagesProvider language="Nim" implementationClass="org.nimjet.psi.usages.NimFindUsagesProvider"/>
+        <renamePsiElementProcessor implementation="org.nimjet.psi.NimRenamePsiElementProcessor"/>
 
     </extensions>
 
