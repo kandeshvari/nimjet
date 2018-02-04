@@ -1,74 +1,43 @@
 package org.nimjet.psi.impl;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import generated.psi.*;
-import org.nimjet.psi.ElementTypes;
-import org.nimjet.psi.NimElementFactory;
-
-import java.util.List;
+import org.nimjet.psi.NimNamedElement;
 
 public class NimPsiImplUtil {
-	public static String getName(IdentifierDef element) {
-		return element.getName();
+
+
+	/** Identifier **/
+	public static String getName(Identifier element) {
+		return IdentifierImplUtil.getName(element);
 	}
 
-	public static PsiElement setName(IdentifierDef element, String newName) {
-		ASTNode keyNode = element.getNode().findChildByType(ElementTypes.IDENT);
-		if (keyNode != null) {
-
-			IdentifierDef property = NimElementFactory.Companion.createProperty(element.getProject(), newName);
-			ASTNode newKeyNode = property.getFirstChild().getNode();
-			element.getNode().replaceChild(keyNode, newKeyNode);
-		}
-		return element;
+	public static PsiElement setName(Identifier element, String newName) {
+		return IdentifierImplUtil.setName(element, newName);
 	}
 
-	public static PsiElement getNameIdentifier(IdentifierDef element) {
-		ASTNode keyNode = element.getNode().findChildByType(ElementTypes.IDENT);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+	public static NimNamedElement getNameIdentifier(Identifier element) {
+		return IdentifierImplUtil.getNameIdentifier(element);
 	}
 
-	public PsiReference getReference(Identifier element) {
-		PsiElement parent = element.getParent();
-		if (parent instanceof PsiNamedElement)
-			return null;
-
-		if (parent instanceof IdentifierExpr) {
-			PsiElement grand = parent.getParent();
-
-			if (grand instanceof Pragma || grand instanceof ImportStmt)
-				return null;
-
-//			if (grand instanceof SimpleTypeDesc || grand instanceof ObjectCtor || grand instanceof TupleTypeExpr ||
-//				grand instanceof BracketExpr && grand.getParent() instanceof SimpleTypeDesc)
-//				return new TypeReference(this);
-//
-//			if (grand instanceof CallExpr && parent == ((CallExpr) grand).getCallee())
-//				return new ProcReference(this, ((CallExpr) grand).getArgumentList());
-		}
-
-//		if (parent instanceof DotExpr) {
-//			PsiElement grand = parent.getParent();
-//			List<Expression> args = null;
-//			if (grand instanceof CallExpr && ((CallExpr) grand).getCallee() == parent)
-//				args = ((CallExpr) grand).getArgumentList();
-//			return new MemberReference(((DotExpr) parent).getReceiver(), this, args);
-//		}
-//
-//		if (parent instanceof CtorArg) {
-//			PsiElement ctor = parent.getParent();
-//			if (ctor instanceof ObjectCtor) {
-//				return new MemberReference((Expression) ctor, this);
-//			}
-//		}
-
-		return new IdentifierReference(this);
+	public static PsiReference getReference(Identifier element) {
+		return IdentifierImplUtil.getReference(element);
 	}
+	/* END: Identifier */
+
+
+	/** ProcDef **/
+	public static String getName(ProcDef element) {
+		return ProcDefImplUtil.getName(element);
+	}
+
+	public static PsiElement setName(ProcDef element, String newName) {
+		return ProcDefImplUtil.setName(element, newName);
+	}
+
+	public static NimNamedElement getNameIdentifier(ProcDef element) {
+		return ProcDefImplUtil.getNameIdentifier(element);
+	}
+	/* END: ProcDef */
 }

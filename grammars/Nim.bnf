@@ -56,8 +56,7 @@ Literal ::= FLOAT64_LITERAL
 Identifier ::= symbol {
     mixin="org.nimjet.psi.impl.NimNamedElementImpl"
     implements="org.nimjet.psi.NimNamedElement"
-    methods=[getReference]
-//    methods=[getName setName getNameIdentifier getReference]
+    methods=[getReference getName setName getNameIdentifier ]
 }
 
 // Used when the identifier is the sole element that represents a definition.
@@ -172,7 +171,12 @@ routineParamList ::= <<listOf identColonEqualsWithBothOptionalWithPragma (T_COMM
 private paramListColon ::= params? (&INDNONE colonTypeDesc)?
 private paramListArrow ::= params? (&INDNONE <<arrow>> &OPTIND TypeDesc)?
 
-ProcDef ::= T_PROC routine {pin=1 extends=Statement}
+ProcDef ::= T_PROC routine { pin=1
+//    mixin=["org.nimjet.psi.impl.NimNamedElementImpl" "generated.psi.impl.StatementImpl"]
+    implements="org.nimjet.psi.NimNamedElement"
+    methods=[getName setName getNameIdentifier getStatement]
+    extends=Statement
+}
 
 MethodDef ::= T_METHOD routine {pin=1 extends=Statement}
 
